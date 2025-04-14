@@ -1,4 +1,8 @@
-/* Base Styles */
+.logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: none;
+}/* Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -39,9 +43,20 @@ header {
     border-bottom: 1px solid #eee;
 }
 
-.logo a {
+.logo {
     font-size: 1.5rem;
     font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.logo .tagline {
+    font-size: 0.8rem;
+    font-weight: normal;
+    color: #666;
+    margin-top: -5px;
+    margin-left: 2px;
 }
 
 .logo span {
