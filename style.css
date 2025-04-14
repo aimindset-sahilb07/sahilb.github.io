@@ -60,7 +60,7 @@ header {
 }
 
 .logo span {
-    color: #6d28d9;
+    color: #4f46e5;
 }
 
 nav ul {
@@ -180,11 +180,13 @@ nav ul li a:hover {
     border-radius: 4px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: all 0.3s ease;
+    border-left: 3px solid #4f46e5;
 }
 
 .skill-item:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9ff;
 }
 
 /* Projects Section */
@@ -206,6 +208,7 @@ nav ul li a:hover {
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transition: all 0.3s ease;
+    border-top: 4px solid #4f46e5;
 }
 
 .project-card:hover {
