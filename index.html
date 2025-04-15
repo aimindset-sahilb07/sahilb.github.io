@@ -19,6 +19,7 @@
                 <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#skills">Skills</a></li>
+                <li><a href="#organizations">Organizations</a></li>
                 <li><a href="#featured-posts">Posts</a></li>
                 <li><a href="#contact">Contact</a></li>
             </ul>
@@ -58,7 +59,7 @@
           </div>
         </section>
 
-        <section id="skills" class="skills">
+        <section id="skills" class="skills fade-in-section">
             <h2>Core Competencies</h2>
             <div class="skills-grid">
                 <div class="skill-item">Technical Program Management</div>
@@ -71,6 +72,18 @@
                 <div class="skill-item">Executive Communication</div>
                 <div class="skill-item">AI Implementation</div>
             </div>
+        </section>
+
+        <section id="organizations" class="organizations alt-bg fade-in-section">
+          <h2>Organizations I've Worked With</h2>
+          <div class="org-logos">
+            <img src="images/org1.png" alt="Organization 1" class="org-logo fade-in-logo">
+            <img src="images/org2.png" alt="Organization 2" class="org-logo fade-in-logo">
+            <img src="images/org3.png" alt="Organization 3" class="org-logo fade-in-logo">
+            <img src="images/org4.png" alt="Organization 4" class="org-logo fade-in-logo">
+            <img src="images/org5.png" alt="Organization 5" class="org-logo fade-in-logo">
+            <img src="images/org6.png" alt="Organization 6" class="org-logo fade-in-logo">
+          </div>
         </section>
 
         <section id="featured-posts" class="featured-posts">
@@ -108,11 +121,14 @@
                 <a href="mailto:sahil.n.bareja@gmail.com" class="contact-button">
                     <i class="far fa-envelope"></i> Email
                 </a>
+                <a href="https://calendly.com/sahil-n-bareja/30min" class="contact-button" target="_blank" rel="noopener">
+                    <i class="fa fa-calendar"></i> Schedule a Call
+                </a>
             </div>
         </section>
     </main>
     <script>
-    // Simple scroll fade-in animation for sections
+    // Simple scroll fade-in animation for sections and org logos
     function revealSections() {
       const sections = document.querySelectorAll('section');
       const trigger = window.innerHeight * 0.85;
@@ -120,9 +136,18 @@
         const top = section.getBoundingClientRect().top;
         if (top < trigger) {
           section.classList.add('visible');
+          // If this is the organizations section, fade in logos staggered
+          if (section.classList.contains('organizations')) {
+            const logos = section.querySelectorAll('.org-logo');
+            logos.forEach((logo, idx) => {
+              setTimeout(() => logo.classList.add('visible'), 150 * idx);
+            });
+          }
         }
       });
     }
+    window.addEventListener('scroll', revealSections);
+    window.addEventListener('load', revealSections);
 
     // Underline scroll animation for About Me
     function animateAboutUnderline() {
@@ -210,11 +235,9 @@
     });
 
     window.addEventListener('scroll', function() {
-      revealSections();
       animateAboutUnderline();
     });
     window.addEventListener('load', function() {
-      revealSections();
       animateAboutUnderline();
     });
     </script>
