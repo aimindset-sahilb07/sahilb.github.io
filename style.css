@@ -344,28 +344,17 @@ main, .main-content {
 
 .carousel-track {
     display: flex;
+    transition: transform 0.5s cubic-bezier(0.4,0,0.2,1);
     width: 100%;
-    position: relative;
-    transition: none; /* No sliding animation, just show/hide */
 }
 
 .carousel-slide {
-    width: 100%;
     min-width: 100%;
     box-sizing: border-box;
-    display: none;
+    display: flex;
     justify-content: center;
     align-items: center;
     padding: 2rem 0;
-    transition: opacity 0.5s;
-    opacity: 0;
-    pointer-events: none;
-}
-
-.carousel-slide.active {
-    display: flex;
-    opacity: 1;
-    pointer-events: auto;
 }
 
 .carousel-slide iframe {

@@ -152,19 +152,12 @@
       const dotsContainer = document.querySelector('.carousel-dots');
       let currentIndex = 0;
       function updateCarousel() {
-        slides.forEach((slide, idx) => {
-          if (idx === currentIndex) {
-            slide.classList.add('active');
-          } else {
-            slide.classList.remove('active');
-          }
-        });
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
         Array.from(dotsContainer.children).forEach((dot, idx) => {
           dot.classList.toggle('active', idx === currentIndex);
         });
       }
       // Create dots
-      dotsContainer.innerHTML = '';
       slides.forEach((_, idx) => {
         const dot = document.createElement('span');
         dot.className = 'carousel-dot' + (idx === 0 ? ' active' : '');
