@@ -11,12 +11,12 @@
 <body>
     <header>
         <div class="logo">
-            <a href="index.html">Sahil <span>Bareja</span></a>
+            <a href="#home">Sahil <span>Bareja</span></a>
             <p class="tagline">Bridging Innovative Technology & Business Reality</p>
         </div>
         <nav>
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="#home">Home</a></li>
                 <li><a href="#about">About</a></li>
                 <li><a href="#skills">Skills</a></li>
                 <li><a href="#featured-posts">Posts</a></li>
@@ -142,6 +142,40 @@
         underline.style.transform = 'scaleX(0)';
       }
     }
+
+    // Modern scrollspy for nav highlight
+    document.addEventListener('DOMContentLoaded', function() {
+      const navLinks = document.querySelectorAll('nav ul li a[href^="#"]');
+      const sections = Array.from(document.querySelectorAll('section'));
+      function onScrollSpy() {
+        let scrollPos = window.scrollY + 110; // offset for fixed header
+        let currentSectionId = '';
+        for (const section of sections) {
+          if (section.offsetTop <= scrollPos && (section.offsetTop + section.offsetHeight) > scrollPos) {
+            currentSectionId = section.id;
+            break;
+          }
+        }
+        // Special case: top of page = Home
+        if (window.scrollY < 100) {
+          currentSectionId = 'home';
+        }
+        // Special case: bottom of page = Contact
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 2) {
+          currentSectionId = 'contact';
+        }
+        navLinks.forEach(link => {
+          if (link.getAttribute('href') === '#' + currentSectionId) {
+            link.classList.add('active');
+          } else {
+            link.classList.remove('active');
+          }
+        });
+      }
+      window.addEventListener('scroll', onScrollSpy);
+      window.addEventListener('load', onScrollSpy);
+      onScrollSpy();
+    });
 
     // Carousel functionality
     document.addEventListener('DOMContentLoaded', function() {
