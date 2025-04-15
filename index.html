@@ -75,11 +75,24 @@
 
         <section id="featured-posts" class="featured-posts">
             <h2>Featured Posts</h2>
-            <div class="posts-grid">
-                <!-- LinkedIn Post Embed -->
-                <div class="post-card linkedin-embed">
-                    <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7307815127834058752?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post"></iframe>
+            <div class="carousel-container">
+                <div class="carousel-track">
+                    <!-- LinkedIn Post 1 -->
+                    <div class="carousel-slide">
+                        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7307815127834058752?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 1"></iframe>
+                    </div>
+                    <!-- LinkedIn Post 2 -->
+                    <div class="carousel-slide">
+                        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7315206988731154432?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 2"></iframe>
+                    </div>
+                    <!-- LinkedIn Post 3 -->
+                    <div class="carousel-slide">
+                        <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7261952879635107840?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 3"></iframe>
+                    </div>
                 </div>
+                <button class="carousel-btn prev" aria-label="Previous Post">&#10094;</button>
+                <button class="carousel-btn next" aria-label="Next Post">&#10095;</button>
+                <div class="carousel-dots"></div>
             </div>
         </section>
 
@@ -118,7 +131,6 @@
       if (!aboutSection || !underline) return;
       const rect = aboutSection.getBoundingClientRect();
       const windowHeight = window.innerHeight;
-      // Only animate if section is in viewport and section is not shorter than viewport
       if (rect.height > windowHeight && rect.top < windowHeight && rect.bottom > 0) {
         const totalScroll = rect.height - windowHeight;
         const scrolled = Math.min(Math.max(windowHeight - rect.top, 0), rect.height);
@@ -130,6 +142,39 @@
         underline.style.transform = 'scaleX(0)';
       }
     }
+
+    // Carousel functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const track = document.querySelector('.carousel-track');
+      const slides = Array.from(document.querySelectorAll('.carousel-slide'));
+      const prevBtn = document.querySelector('.carousel-btn.prev');
+      const nextBtn = document.querySelector('.carousel-btn.next');
+      const dotsContainer = document.querySelector('.carousel-dots');
+      let currentIndex = 0;
+      function updateCarousel() {
+        track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        Array.from(dotsContainer.children).forEach((dot, idx) => {
+          dot.classList.toggle('active', idx === currentIndex);
+        });
+      }
+      // Create dots
+      slides.forEach((_, idx) => {
+        const dot = document.createElement('span');
+        dot.className = 'carousel-dot' + (idx === 0 ? ' active' : '');
+        dot.addEventListener('click', () => { currentIndex = idx; updateCarousel(); });
+        dotsContainer.appendChild(dot);
+      });
+      prevBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+        updateCarousel();
+      });
+      nextBtn.addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        updateCarousel();
+      });
+      updateCarousel();
+    });
+
     window.addEventListener('scroll', function() {
       revealSections();
       animateAboutUnderline();
