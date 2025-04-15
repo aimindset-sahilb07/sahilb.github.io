@@ -198,6 +198,9 @@ main, .main-content {
 .btn,
 .contact-button {
   background: linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
+  background: -webkit-linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
+  background: -moz-linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
+  background: -o-linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
   color: #3d246c;
   border: none;
   border-radius: 8px;
@@ -215,6 +218,9 @@ main, .main-content {
 .btn.btn-dark,
 .contact-button {
   background: linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
+  background: -webkit-linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
+  background: -moz-linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
+  background: -o-linear-gradient(90deg, #ede7f6 0%, #f8eafd 100%);
   color: #3d246c;
 }
 .btn.btn-light {
