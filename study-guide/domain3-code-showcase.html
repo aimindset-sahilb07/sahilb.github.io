@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain 3 — Code Showcase</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e18;
+    --surface: #161625;
+    --surface2: #1e1e30;
+    --border: #2a2a40;
+    --text: #d0d0e0;
+    --text-dim: #7a7a95;
+    --accent: #f0813a;
+    --accent-dim: rgba(240,129,58,0.12);
+    --teal: #3ac5a8;
+    --teal-dim: rgba(58,197,168,0.12);
+    --purple: #9b7aed;
+    --purple-dim: rgba(155,122,237,0.12);
+    --red: #e85d4a;
+    --red-dim: rgba(232,93,74,0.12);
+    --yellow: #ebc95a;
+    --yellow-dim: rgba(235,201,90,0.12);
+    --blue: #5aa8eb;
+    --blue-dim: rgba(90,168,235,0.12);
+    --green: #5aeb87;
+    --comment: #555570;
+    --keyword: #c792ea;
+    --string: #c3e88d;
+    --func: #82aaff;
+    --tag: #f07178;
+    --attr: #ffcb6b;
+    --mono: 'JetBrains Mono', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  .header {
+    padding: 50px 32px 36px;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%; transform: translateX(-50%);
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(240,129,58,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .header-badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 400;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .header h1 span { color: var(--accent); }
+  .header p { color: var(--text-dim); font-size: 0.92rem; }
+
+  .section-nav {
+    display: flex;
+    gap: 6px;
+    padding: 16px 32px;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background: var(--surface);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .section-btn {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .section-btn:hover { border-color: var(--accent); color: var(--text); }
+  .section-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .main { max-width: 960px; margin: 0 auto; padding: 32px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .task-header { margin-bottom: 32px; }
+  .task-num {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    color: var(--accent);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .task-header h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.7rem;
+    color: #fff;
+    font-weight: 400;
+  }
+  .task-desc {
+    color: var(--text-dim);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    max-width: 700px;
+  }
+
+  .explorer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .explorer-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    color: var(--text-dim);
+  }
+  .dots { display: flex; gap: 5px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-r { background: #e85d4a; }
+  .dot-y { background: #ebc95a; }
+  .dot-g { background: #5aeb87; }
+
+  .tree {
+    padding: 18px 20px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 2;
+  }
+  .tree-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 2px 8px;
+    border-radius: 5px;
+    transition: background 0.15s;
+  }
+  .tree-line:hover { background: rgba(255,255,255,0.03); }
+  .tree-icon { font-size: 0.85rem; width: 18px; text-align: center; flex-shrink: 0; }
+  .tree-name { color: var(--text); }
+  .tree-line.dir .tree-name { color: var(--blue); }
+  .tree-line.special .tree-name { color: var(--teal); }
+  .tree-annotation {
+    margin-left: auto;
+    font-size: 0.68rem;
+    padding: 2px 10px;
+    border-radius: 10px;
+    white-space: nowrap;
+  }
+  .ann-auto { background: var(--teal-dim); color: var(--teal); }
+  .ann-manual { background: var(--accent-dim); color: var(--accent); }
+  .ann-passive { background: var(--purple-dim); color: var(--purple); }
+  .ann-personal { background: var(--yellow-dim); color: var(--yellow); }
+  .ann-condition { background: var(--blue-dim); color: var(--blue); }
+  .ann-shared { background: var(--teal-dim); color: var(--teal); }
+
+  .code-viewer {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+  .code-tab-bar {
+    display: flex;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+  }
+  .code-tab {
+    font-family: var(--mono);
+    font-size: 0.74rem;
+    padding: 10px 18px;
+    color: var(--text-dim);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .code-tab:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+  .code-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .code-pane { display: none; }
+  .code-pane.active { display: block; }
+  .code-content {
+    padding: 20px 24px;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.9;
+    overflow-x: auto;
+    white-space: pre;
+    counter-reset: line;
+  }
+  .code-content .line { display: block; }
+  .code-content .line::before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    width: 30px;
+    margin-right: 20px;
+    text-align: right;
+    color: #3a3a50;
+    font-size: 0.72rem;
+    user-select: none;
+  }
+
+  .cm { color: var(--comment); font-style: italic; }
+  .kw { color: var(--keyword); }
+  .st { color: var(--string); }
+  .fn { color: var(--func); }
+  .tg { color: var(--tag); }
+  .at { color: var(--attr); }
+  .ac { color: var(--accent); }
+  .vr { color: var(--teal); }
+  .nm { color: var(--yellow); }
+
+  .annotation {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    color: var(--text-dim);
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: rgba(240,129,58,0.04);
+  }
+  .annotation strong { color: var(--text); }
+  .annotation code {
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    background: rgba(255,255,255,0.06);
+    padding: 1px 6px;
+    border-radius: 3px;
+  }
+  .ann-icon {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    background: var(--accent-dim);
+    color: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    margin-top: 1px;
+  }
+  .annotation.teal-ann { background: rgba(58,197,168,0.04); }
+  .annotation.teal-ann .ann-icon { background: var(--teal-dim); color: var(--teal); }
+  .annotation.purple-ann { background: rgba(155,122,237,0.04); }
+  .annotation.purple-ann .ann-icon { background: var(--purple-dim); color: var(--purple); }
+  .annotation.red-ann { background: rgba(232,93,74,0.04); }
+  .annotation.red-ann .ann-icon { background: var(--red-dim); color: var(--red); }
+
+  .concept-box {
+    background: linear-gradient(135deg, #1a1a30, #22223a);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  .concept-box h4 {
+    font-family: 'DM Serif Display', serif;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--accent);
+    margin-bottom: 14px;
+  }
+  .concept-row {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+  }
+  .concept-label {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 3px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .cl-orange { background: var(--accent-dim); color: var(--accent); }
+  .cl-teal { background: var(--teal-dim); color: var(--teal); }
+  .cl-purple { background: var(--purple-dim); color: var(--purple); }
+  .cl-red { background: var(--red-dim); color: var(--red); }
+  .cl-blue { background: var(--blue-dim); color: var(--blue); }
+
+  .flow-visual {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+  }
+  .flow-box {
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-family: var(--mono);
+    font-size: 0.78rem;
+    font-weight: 600;
+    border: 1px solid;
+  }
+  .fb-orange { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .fb-teal { background: var(--teal-dim); border-color: var(--teal); color: var(--teal); }
+  .fb-purple { background: var(--purple-dim); border-color: var(--purple); color: var(--purple); }
+  .fb-red { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+  .flow-arrow { color: var(--text-dim); font-size: 1rem; }
+
+  @media (max-width: 640px) {
+    .main { padding: 20px 16px; }
+    .section-nav { padding: 12px 16px; }
+    .code-content { font-size: 0.72rem; padding: 14px 16px; }
+    .header { padding: 36px 20px 28px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-badge">Code Showcase</div>
+  <h1>Domain 3 — <span>In Practice</span></h1>
+  <p>Real file structures and code examples for every concept</p>
+</div>
+
+<div class="section-nav" id="sectionNav"></div>
+<div class="main" id="mainContent"></div>
+
+<script>
+const sections = [
+  {
+    id: "hierarchy", label: "3.1 Hierarchy", title: "Configuration Hierarchy", num: "TASK 3.1",
+    desc: "Three levels of CLAUDE.md, @import for selective loading, .claude/rules/ for auto-loading.",
+    content: `
+      <div class="explorer">
+        <div class="explorer-header"><div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>ecommerce-platform/ — Full Hierarchy</div>
+        <div class="tree">
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span class="tree-name">~/.claude/</span><span class="tree-annotation ann-personal">user-level</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:16px"></span><span class="tree-name">CLAUDE.md</span><span class="tree-annotation ann-personal">personal only</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span class="tree-name">ecommerce-platform/</span></div>
+          <div class="tree-line dir special"><span class="tree-icon">📁</span><span style="display:inline-block;width:16px"></span><span class="tree-name">.claude/</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:32px"></span><span class="tree-name">CLAUDE.md</span><span class="tree-annotation ann-auto">project — auto-loaded</span></div>
+          <div class="tree-line dir special"><span class="tree-icon">📁</span><span style="display:inline-block;width:32px"></span><span class="tree-name">rules/</span><span class="tree-annotation ann-auto">auto-loaded</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">testing.md</span><span class="tree-annotation ann-condition">paths: **/*.test.*</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">security.md</span><span class="tree-annotation ann-auto">always loaded</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">terraform.md</span><span class="tree-annotation ann-condition">paths: infra/**/*</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:16px"></span><span class="tree-name">standards/</span><span class="tree-annotation ann-passive">passive — needs @import</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:32px"></span><span class="tree-name">python-style.md</span><span class="tree-annotation ann-passive">ignored unless @imported</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:32px"></span><span class="tree-name">typescript-style.md</span><span class="tree-annotation ann-passive">ignored unless @imported</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:32px"></span><span class="tree-name">react-patterns.md</span><span class="tree-annotation ann-passive">ignored unless @imported</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:16px"></span><span class="tree-name">packages/</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:32px"></span><span class="tree-name">api/</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">CLAUDE.md</span><span class="tree-annotation ann-manual">@imports python-style.md</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:32px"></span><span class="tree-name">storefront/</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">CLAUDE.md</span><span class="tree-annotation ann-manual">@imports ts + react</span></div>
+        </div>
+      </div>
+      <div id="cv31" class="code-viewer">
+        <div class="code-tab-bar">
+          <div class="code-tab active" data-cv="cv31" data-pane="0">~/.claude/CLAUDE.md</div>
+          <div class="code-tab" data-cv="cv31" data-pane="1">.claude/CLAUDE.md</div>
+          <div class="code-tab" data-cv="cv31" data-pane="2">packages/api/CLAUDE.md</div>
+          <div class="code-tab" data-cv="cv31" data-pane="3">packages/storefront/CLAUDE.md</div>
+          <div class="code-tab" data-cv="cv31" data-pane="4">standards/python-style.md</div>
+        </div>
+        <div class="code-pane active" data-cv="cv31" data-idx="0"><div class="code-content"><span class="line"><span class="cm"># My Personal Preferences (NOT shared with team)</span></span><span class="line"></span><span class="line"><span class="cm">## Editor Behavior</span></span><span class="line">- Always include inline comments in generated code</span><span class="line">- I prefer verbose variable names over abbreviations</span><span class="line">- Use tabs, not spaces</span><span class="line"></span><span class="line"><span class="cm">## My Shortcuts</span></span><span class="line">- When I say "scaffold", generate full boilerplate with tests</span><span class="line">- When I say "doc it", add JSDoc to every exported function</span></div><div class="annotation"><div class="ann-icon">!</div><div><strong style="color:var(--yellow)">User-level:</strong> Lives on YOUR machine. New teammates don't get it. Putting team conventions here is the Classic Gotcha.</div></div></div>
+        <div class="code-pane" data-cv="cv31" data-idx="1"><div class="code-content"><span class="line"><span class="cm"># Ecommerce Platform — Project Standards</span></span><span class="line"></span><span class="line"><span class="cm">## Universal Rules (every developer, every session)</span></span><span class="line">- All code must pass CI checks before merge</span><span class="line">- Never commit secrets or API keys</span><span class="line">- PR descriptions must include "Why" and "What Changed"</span><span class="line"></span><span class="line"><span class="cm">## Git Conventions</span></span><span class="line">- Branch naming: feature/TICKET-ID-short-description</span><span class="line">- Commit messages follow Conventional Commits</span><span class="line">- Squash merge to main</span><span class="line"></span><span class="line"><span class="cm">## Architecture</span></span><span class="line">- Packages are independent — no cross-package imports</span><span class="line">- Shared types live in packages/shared-types/</span></div><div class="annotation teal-ann"><div class="ann-icon">✓</div><div><strong style="color:var(--teal)">Project-level:</strong> Version-controlled, shared with the whole team. The team handbook.</div></div></div>
+        <div class="code-pane" data-cv="cv31" data-idx="2"><div class="code-content"><span class="line"><span class="cm"># packages/api/CLAUDE.md — selective imports</span></span><span class="line"></span><span class="line"><span class="ac">@import</span> <span class="st">../../standards/python-style.md</span></span><span class="line"><span class="ac">@import</span> <span class="st">../../standards/rest-api-conventions.md</span></span><span class="line"></span><span class="line"><span class="cm"># API-Specific Rules</span></span><span class="line">- All endpoints must include rate limiting middleware</span><span class="line">- Use snake_case for all route parameters</span><span class="line">- Every handler must catch and log exceptions</span><span class="line">- Database queries go through the ORM — no raw SQL</span><span class="line">- Response format: { data: ..., meta: { page, total } }</span></div><div class="annotation"><div class="ann-icon">→</div><div><strong style="color:var(--accent)">@import in action:</strong> Pulls in python-style.md and REST conventions from the passive standards/ library. Storefront rules never load here — zero context noise.</div></div></div>
+        <div class="code-pane" data-cv="cv31" data-idx="3"><div class="code-content"><span class="line"><span class="cm"># packages/storefront/CLAUDE.md — different imports</span></span><span class="line"></span><span class="line"><span class="ac">@import</span> <span class="st">../../standards/typescript-style.md</span></span><span class="line"><span class="ac">@import</span> <span class="st">../../standards/react-patterns.md</span></span><span class="line"></span><span class="line"><span class="cm"># Storefront-Specific Rules</span></span><span class="line">- All components must have .test.tsx files</span><span class="line">- Use CSS Modules, never inline styles</span><span class="line">- Images must use next/image for optimization</span><span class="line">- Client-side state via Zustand — no Redux</span><span class="line">- Server components by default, 'use client' only when needed</span></div><div class="annotation purple-ann"><div class="ann-icon">≠</div><div><strong style="color:var(--purple)">Different package, different imports:</strong> Same mechanism, completely different standards. Python rules never touch this package.</div></div></div>
+        <div class="code-pane" data-cv="cv31" data-idx="4"><div class="code-content"><span class="line"><span class="cm"># standards/python-style.md</span></span><span class="line"><span class="cm"># PASSIVE — Claude Code ignores unless @imported</span></span><span class="line"></span><span class="line"><span class="cm">## Type Hints</span></span><span class="line">- All function signatures must include type hints</span><span class="line">- Use Optional[X] for nullable params</span><span class="line">- Return types are mandatory, including -> None</span><span class="line"></span><span class="line"><span class="cm">## Naming</span></span><span class="line">- snake_case for functions and variables</span><span class="line">- PascalCase for classes</span><span class="line">- UPPER_SNAKE for constants</span><span class="line"></span><span class="line"><span class="cm">## Imports</span></span><span class="line">- stdlib first, third-party second, local third</span><span class="line">- Absolute imports only</span><span class="line">- One import per line, no wildcard imports</span></div><div class="annotation"><div class="ann-icon">📚</div><div><strong style="color:var(--accent)">Passive library:</strong> Written once, reused via @import. Update once, every consumer gets the update. Single source of truth.</div></div></div>
+      </div>`
+  },
+  {
+    id: "commands", label: "3.2 Commands & Skills", title: "Slash Commands & Skills", num: "TASK 3.2",
+    desc: "Commands are simple prompt shortcuts. Skills add execution governance — isolation, tool restriction, argument hints.",
+    content: `
+      <div class="explorer">
+        <div class="explorer-header"><div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>Commands & Skills Layout</div>
+        <div class="tree">
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span class="tree-name">~/.claude/</span><span class="tree-annotation ann-personal">user-level</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:16px"></span><span class="tree-name">commands/</span><span class="tree-annotation ann-personal">personal</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:32px"></span><span class="tree-name">my-debug.md</span><span class="tree-annotation ann-personal">only I see /my-debug</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span class="tree-name">.claude/</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:16px"></span><span class="tree-name">commands/</span><span class="tree-annotation ann-shared">team-wide</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:32px"></span><span class="tree-name">new-endpoint.md</span><span class="tree-annotation ann-shared">/new-endpoint</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:16px"></span><span class="tree-name">skills/</span><span class="tree-annotation ann-shared">team-wide</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:32px"></span><span class="tree-name">codebase-audit/</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">SKILL.md</span><span class="tree-annotation ann-auto">context: fork</span></div>
+          <div class="tree-line dir"><span class="tree-icon">📁</span><span style="display:inline-block;width:32px"></span><span class="tree-name">generate-docs/</span></div>
+          <div class="tree-line"><span class="tree-icon">📄</span><span style="display:inline-block;width:48px"></span><span class="tree-name">SKILL.md</span><span class="tree-annotation ann-condition">allowed-tools: read/write</span></div>
+        </div>
+      </div>
+      <div id="cv32" class="code-viewer">
+        <div class="code-tab-bar">
+          <div class="code-tab active" data-cv="cv32" data-pane="0">new-endpoint.md (command)</div>
+          <div class="code-tab" data-cv="cv32" data-pane="1">codebase-audit SKILL.md</div>
+          <div class="code-tab" data-cv="cv32" data-pane="2">generate-docs SKILL.md</div>
+          <div class="code-tab" data-cv="cv32" data-pane="3">my-debug.md (personal)</div>
+        </div>
+        <div class="code-pane active" data-cv="cv32" data-idx="0"><div class="code-content"><span class="line"><span class="cm"># .claude/commands/new-endpoint.md</span></span><span class="line"><span class="cm"># Usage: /new-endpoint — a simple reusable prompt</span></span><span class="line"></span><span class="line">Create a new REST API endpoint with:</span><span class="line"></span><span class="line">1. Route handler in src/api/routes/</span><span class="line">2. Request/response validation schemas (Pydantic)</span><span class="line">3. Rate limiting middleware decorator</span><span class="line">4. OpenAPI docstring for auto-generated docs</span><span class="line">5. Test file with:</span><span class="line">   - Happy path test</span><span class="line">   - Validation error test</span><span class="line">   - Auth failure test</span><span class="line">   - Rate limit test</span><span class="line">6. Register route in src/api/routes/__init__.py</span><span class="line"></span><span class="line">Follow the pattern in src/api/routes/users.py</span></div><div class="annotation"><div class="ann-icon">⌘</div><div><strong style="color:var(--accent)">Slash command:</strong> Just a saved prompt. No frontmatter, no isolation, no tool restrictions. Runs directly in your main conversation. Simple shortcut for repetitive tasks.</div></div></div>
+        <div class="code-pane" data-cv="cv32" data-idx="1"><div class="code-content"><span class="line"><span class="cm">---</span></span><span class="line"><span class="at">context</span>: <span class="kw">fork</span></span><span class="line"><span class="at">argument-hint</span>: <span class="st">"area to audit, e.g. 'authentication' or 'payments'"</span></span><span class="line"><span class="cm">---</span></span><span class="line"></span><span class="line"><span class="cm"># Codebase Audit Skill</span></span><span class="line"></span><span class="line">Perform a comprehensive audit of the specified area:</span><span class="line"></span><span class="line">1. Map all files related to the target area</span><span class="line">2. Trace the dependency graph</span><span class="line">3. Identify code smells:</span><span class="line">   - Functions longer than 50 lines</span><span class="line">   - Circular dependencies</span><span class="line">   - Duplicated logic</span><span class="line">   - Missing error handling</span><span class="line">4. Check test coverage gaps</span><span class="line">5. Flag security concerns</span><span class="line"></span><span class="line">Return a summary with critical issues, warnings,</span><span class="line">and suggested refactoring priorities.</span></div><div class="annotation teal-ann"><div class="ann-icon">⑂</div><div><strong style="color:var(--teal)">context: fork —</strong> Massive discovery output stays isolated in a sub-agent. Only the summary returns. Human triggers, sub-agent executes. <strong>argument-hint</strong> prompts for target area if invoked without args.</div></div></div>
+        <div class="code-pane" data-cv="cv32" data-idx="2"><div class="code-content"><span class="line"><span class="cm">---</span></span><span class="line"><span class="at">allowed-tools</span>:</span><span class="line">  - <span class="fn">Read</span></span><span class="line">  - <span class="fn">Write</span></span><span class="line"><span class="at">argument-hint</span>: <span class="st">"package name, e.g. 'api' or 'storefront'"</span></span><span class="line"><span class="cm">---</span></span><span class="line"></span><span class="line"><span class="cm"># Generate Documentation Skill</span></span><span class="line"></span><span class="line">For the specified package, generate comprehensive docs:</span><span class="line"></span><span class="line">1. Scan all exported functions and classes</span><span class="line">2. Generate JSDoc/docstrings where missing</span><span class="line">3. Create package-level README.md</span><span class="line">4. Update the root docs/packages/ index</span><span class="line"></span><span class="line">Style: concise, example-driven, no filler text.</span></div><div class="annotation purple-ann"><div class="ann-icon">🔒</div><div><strong style="color:var(--purple)">allowed-tools: Read + Write only —</strong> Cannot run bash, execute code, or do anything destructive. Principle of least tooling at the skill level.</div></div></div>
+        <div class="code-pane" data-cv="cv32" data-idx="3"><div class="code-content"><span class="line"><span class="cm"># ~/.claude/commands/my-debug.md</span></span><span class="line"><span class="cm"># Personal — teammates don't see this</span></span><span class="line"></span><span class="line">When I share an error:</span><span class="line"></span><span class="line">1. Don't fix it immediately</span><span class="line">2. Explain what's happening in plain English</span><span class="line">3. Show the relevant code with the bug highlighted</span><span class="line">4. Explain WHY it's broken (root cause)</span><span class="line">5. Then suggest the fix</span><span class="line">6. If multiple approaches, list tradeoffs</span><span class="line"></span><span class="line">I learn better when I understand the "why" first.</span></div><div class="annotation"><div class="ann-icon">👤</div><div><strong style="color:var(--yellow)">User-scoped:</strong> Your learning style, your preferences. Same project/user hierarchy from 3.1 repeating.</div></div></div>
+      </div>
+      <div class="concept-box">
+        <h4>Skill Execution Flow (context: fork)</h4>
+        <div class="flow-visual">
+          <div class="flow-box fb-orange">Human invokes</div><div class="flow-arrow">→</div>
+          <div class="flow-box fb-teal">Sub-agent spawns</div><div class="flow-arrow">→</div>
+          <div class="flow-box fb-purple">500 lines of analysis</div><div class="flow-arrow">→</div>
+          <div class="flow-box fb-orange">10-line summary returned</div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-dim);margin-top:10px;">Sub-agent = execution mechanism. Human = invoker. In Domain 3, skills are always human-triggered.</p>
+      </div>`
+  },
+  {
+    id: "paths", label: "3.3 Path Rules", title: "Path-Specific Rules", num: "TASK 3.3",
+    desc: "Glob patterns in YAML frontmatter make rules conditional — load only when matching files are edited.",
+    content: `
+      <div id="cv33" class="code-viewer">
+        <div class="code-tab-bar">
+          <div class="code-tab active" data-cv="cv33" data-pane="0">rules/testing.md</div>
+          <div class="code-tab" data-cv="cv33" data-pane="1">rules/terraform.md</div>
+          <div class="code-tab" data-cv="cv33" data-pane="2">rules/security.md (no paths)</div>
+          <div class="code-tab" data-cv="cv33" data-pane="3">rules/sql-conventions.md</div>
+        </div>
+        <div class="code-pane active" data-cv="cv33" data-idx="0"><div class="code-content"><span class="line"><span class="cm">---</span></span><span class="line"><span class="at">paths</span>: [<span class="st">"**/*.test.tsx"</span>, <span class="st">"**/*.test.ts"</span>, <span class="st">"**/*.test.py"</span>]</span><span class="line"><span class="cm">---</span></span><span class="line"></span><span class="line"><span class="cm"># Testing Conventions</span></span><span class="line"></span><span class="line"><span class="cm">## Structure</span></span><span class="line">- One test file per source file, co-located</span><span class="line">- Group with describe() blocks matching function names</span><span class="line"></span><span class="line"><span class="cm">## Required Coverage</span></span><span class="line">- Happy path</span><span class="line">- Edge cases (empty, null, boundary)</span><span class="line">- Error paths (invalid input, network failures)</span><span class="line">- At least one integration test per file</span><span class="line"></span><span class="line"><span class="cm">## Mocking Rules</span></span><span class="line">- Mock at the network layer (MSW), never mock functions</span><span class="line">- Use renderWithProviders(), not raw render()</span><span class="line">- Reset all mocks in afterEach()</span></div><div class="annotation teal-ann"><div class="ann-icon">✱</div><div><strong style="color:var(--teal)">Conditional:</strong> Only loads when editing *.test.* files — anywhere in the codebase. Zero context cost otherwise. Solves the "tests scattered everywhere" problem.</div></div></div>
+        <div class="code-pane" data-cv="cv33" data-idx="1"><div class="code-content"><span class="line"><span class="cm">---</span></span><span class="line"><span class="at">paths</span>: [<span class="st">"infra/**/*"</span>, <span class="st">"**/*.tf"</span>]</span><span class="line"><span class="cm">---</span></span><span class="line"></span><span class="line"><span class="cm"># Terraform Conventions</span></span><span class="line"></span><span class="line"><span class="cm">## Resource Naming</span></span><span class="line">- Format: {project}-{env}-{resource-type}-{name}</span><span class="line">- Example: ecom-prod-rds-users</span><span class="line"></span><span class="line"><span class="cm">## Required Tags (all resources)</span></span><span class="line">- Environment, Owner, ManagedBy, CostCenter</span><span class="line"></span><span class="line"><span class="cm">## State Management</span></span><span class="line">- Remote state in S3, never local</span><span class="line">- State locking via DynamoDB</span><span class="line">- One state file per environment</span><span class="line"></span><span class="line"><span class="cm">## Security</span></span><span class="line">- No hardcoded credentials</span><span class="line">- Security groups: deny all by default</span><span class="line">- Encryption at rest for all storage</span></div><div class="annotation"><div class="ann-icon">📁</div><div><strong style="color:var(--accent)">Dual pattern:</strong> <code>infra/**/*</code> catches the infra directory. <code>**/*.tf</code> catches Terraform files anywhere else. Both trigger these rules.</div></div></div>
+        <div class="code-pane" data-cv="cv33" data-idx="2"><div class="code-content"><span class="line"><span class="cm"># .claude/rules/security.md</span></span><span class="line"><span class="cm"># NO paths frontmatter — loads EVERY session</span></span><span class="line"></span><span class="line"><span class="cm"># Security Rules (Universal)</span></span><span class="line"></span><span class="line"><span class="cm">## Secrets</span></span><span class="line">- NEVER hardcode API keys, tokens, or passwords</span><span class="line">- Use environment variables</span><span class="line">- Never log sensitive data</span><span class="line"></span><span class="line"><span class="cm">## Input Validation</span></span><span class="line">- Sanitize ALL user input</span><span class="line">- Use parameterized queries — never string concat</span><span class="line">- Validate file uploads: type, size, content</span><span class="line"></span><span class="line"><span class="cm">## Authentication</span></span><span class="line">- All endpoints require auth unless explicitly public</span><span class="line">- JWT tokens expire after 15 minutes</span><span class="line">- Refresh tokens: httpOnly, secure, sameSite=strict</span></div><div class="annotation red-ann"><div class="ann-icon">⚠</div><div><strong style="color:var(--red)">No paths = always loaded.</strong> Security isn't conditional. No glob pattern means this loads every session alongside project CLAUDE.md.</div></div></div>
+        <div class="code-pane" data-cv="cv33" data-idx="3"><div class="code-content"><span class="line"><span class="cm">---</span></span><span class="line"><span class="at">paths</span>: [<span class="st">"**/*.sql"</span>, <span class="st">"**/migrations/**/*"</span>]</span><span class="line"><span class="cm">---</span></span><span class="line"></span><span class="line"><span class="cm"># SQL & Migration Conventions</span></span><span class="line"></span><span class="line"><span class="cm">## Naming</span></span><span class="line">- Tables: plural snake_case (user_accounts)</span><span class="line">- Columns: singular snake_case (created_at)</span><span class="line">- Indexes: idx_{table}_{columns}</span><span class="line"></span><span class="line"><span class="cm">## Migrations</span></span><span class="line">- Always include both UP and DOWN</span><span class="line">- Never modify a deployed migration</span><span class="line">- Test against a copy of prod data</span><span class="line"></span><span class="line"><span class="cm">## Performance</span></span><span class="line">- Index any column used in WHERE or JOIN</span><span class="line">- EXPLAIN ANALYZE before merging new queries</span><span class="line">- No SELECT * — always specify columns</span></div><div class="annotation teal-ann"><div class="ann-icon">≡</div><div><strong style="color:var(--teal)">Cross-cutting:</strong> SQL files and migrations live in different directories. Glob pattern <code>**/*.sql</code> catches them all regardless of location.</div></div></div>
+      </div>
+      <div class="concept-box">
+        <h4>Decision Rule</h4>
+        <div class="concept-row"><span class="concept-label cl-teal">path rules</span><span>File type scattered across codebase (tests, SQL, configs)</span></div>
+        <div class="concept-row"><span class="concept-label cl-purple">dir CLAUDE.md</span><span>All files in one specific folder (packages/api/)</span></div>
+        <div class="concept-row"><span class="concept-label cl-red">no paths</span><span>Universal — must apply every session (security)</span></div>
+      </div>`
+  },
+  {
+    id: "planning", label: "3.4 Plan vs Execute", title: "Plan Mode vs Direct Execution", num: "TASK 3.4",
+    desc: "When to think first vs just do. The Explore subagent for isolating discovery.",
+    content: `
+      <div id="cv34" class="code-viewer">
+        <div class="code-tab-bar">
+          <div class="code-tab active" data-cv="cv34" data-pane="0">Direct Execution</div>
+          <div class="code-tab" data-cv="cv34" data-pane="1">Plan Mode</div>
+          <div class="code-tab" data-cv="cv34" data-pane="2">Combo: Explore + Plan + Execute</div>
+        </div>
+        <div class="code-pane active" data-cv="cv34" data-idx="0"><div class="code-content"><span class="line"><span class="cm"># Scenario: Bug fix with clear stack trace</span></span><span class="line"><span class="cm"># Obvious path, small scope → Direct execution</span></span><span class="line"></span><span class="line"><span class="tg">TypeError</span>: Cannot read property 'email' of undefined</span><span class="line">  at <span class="fn">validateUser</span> (<span class="st">src/api/middleware/auth.py:47</span>)</span><span class="line"></span><span class="line"><span class="cm"># You tell Claude Code:</span></span><span class="line"><span class="st">"Fix the null user error in auth.py line 47"</span></span><span class="line"></span><span class="line"><span class="cm"># Before (broken):</span></span><span class="line"><span class="kw">def</span> <span class="fn">validate_user</span>(token):</span><span class="line">    user = <span class="fn">decode_token</span>(token)</span><span class="line">    <span class="kw">return</span> user.email  <span class="cm"># 💥 if user is None</span></span><span class="line"></span><span class="line"><span class="cm"># After (fixed):</span></span><span class="line"><span class="kw">def</span> <span class="fn">validate_user</span>(token):</span><span class="line">    user = <span class="fn">decode_token</span>(token)</span><span class="line">    <span class="kw">if not</span> user:</span><span class="line">        <span class="kw">raise</span> <span class="tg">AuthenticationError</span>(<span class="st">"Invalid token"</span>)</span><span class="line">    <span class="kw">return</span> user.email</span></div><div class="annotation teal-ann"><div class="ann-icon">⚡</div><div><strong style="color:var(--teal)">Why direct:</strong> Clear stack trace, known file, known line, known fix. One function, one change. Planning would waste time.</div></div></div>
+        <div class="code-pane" data-cv="cv34" data-idx="1"><div class="code-content"><span class="line"><span class="cm"># Scenario: Migrate from JWT to session-based auth</span></span><span class="line"><span class="cm"># Multiple approaches, 30+ files → Plan mode</span></span><span class="line"></span><span class="line"><span class="st">"Plan a migration from JWT to sessions.</span></span><span class="line"><span class="st"> Don't write code — investigate and present options."</span></span><span class="line"></span><span class="line"><span class="cm"># Claude Code returns:</span></span><span class="line"></span><span class="line"><span class="vr">Analysis:</span></span><span class="line">  Files affected: <span class="nm">34</span></span><span class="line">  Session storage options: Redis, PostgreSQL</span><span class="line"></span><span class="line"><span class="vr">Approach A: Redis Sessions</span> (recommended)</span><span class="line">  Pros: fast lookups, built-in TTL, already in stack</span><span class="line">  Cons: Redis becomes critical auth dependency</span><span class="line">  Migration: parallel run for 2 weeks</span><span class="line"></span><span class="line"><span class="vr">Approach B: DB Sessions</span></span><span class="line">  Pros: no new infra, audit trail built in</span><span class="line">  Cons: slower reads, needs cleanup job</span><span class="line">  Migration: feature flag per endpoint</span><span class="line"></span><span class="line"><span class="vr">Approach C: Hybrid</span></span><span class="line">  Pros: best of both, gradual migration</span><span class="line">  Cons: most complex, two auth systems</span></div><div class="annotation"><div class="ann-icon">🗺</div><div><strong style="color:var(--accent)">Why plan:</strong> 34 files, 3 valid approaches, infrastructure tradeoffs. Wrong choice = reverting dozens of files. Think first, decide, then execute.</div></div></div>
+        <div class="code-pane" data-cv="cv34" data-idx="2"><div class="code-content"><span class="line"><span class="cm"># Full combo workflow for complex migrations</span></span><span class="line"></span><span class="line"><span class="cm"># ─── PHASE 1: Explore (forked context) ───</span></span><span class="line"><span class="cm"># Reads 80+ files, traces imports, maps dependencies</span></span><span class="line"><span class="cm"># All verbose output stays isolated</span></span><span class="line"><span class="cm"># Returns summary to main session:</span></span><span class="line"></span><span class="line"><span class="vr">Explore Summary:</span></span><span class="line">  moment.js used in <span class="nm">23 files</span></span><span class="line">  4 patterns: formatting, parsing, comparison, duration</span><span class="line">  3 files use moment-timezone plugin</span><span class="line">  Test coverage: 18/23 files have date-related tests</span><span class="line"></span><span class="line"><span class="cm"># ─── PHASE 2: Plan (main context stays clean) ───</span></span><span class="line"><span class="vr">Recommended:</span> Migrate to date-fns</span><span class="line">  Handles all 4 patterns found</span><span class="line">  Tree-shakeable (reduces bundle 40KB)</span><span class="line">  Sequence: utilities → components → tests</span><span class="line"></span><span class="line"><span class="cm"># ─── PHASE 3: Direct execution ───</span></span><span class="line"><span class="cm"># Plan is clear, implement file by file</span></span></div><div class="annotation purple-ann"><div class="ann-icon">⑂</div><div><strong style="color:var(--purple)">Context preservation:</strong> 80+ files of discovery stays in fork. Plan uses summary. Execution has clean context. Each phase protects the next.</div></div></div>
+      </div>
+      <div class="concept-box">
+        <h4>Quick Decision Checklist</h4>
+        <div class="concept-row"><span class="concept-label cl-teal">Direct</span><span>Clear stack trace? Single file? Known pattern? → Just do it</span></div>
+        <div class="concept-row"><span class="concept-label cl-orange">Plan</span><span>Multiple approaches? 5+ files? Architecture choice? → Think first</span></div>
+        <div class="concept-row"><span class="concept-label cl-purple">Combo</span><span>Complex migration? Unfamiliar codebase? → Explore → Plan → Execute</span></div>
+      </div>`
+  },
+  {
+    id: "iteration", label: "3.5 Iteration", title: "Iterative Refinement", num: "TASK 3.5",
+    desc: "Four techniques for closing the gap between what you meant and what Claude Code produced.",
+    content: `
+      <div id="cv35" class="code-viewer">
+        <div class="code-tab-bar">
+          <div class="code-tab active" data-cv="cv35" data-pane="0">Input/Output Examples</div>
+          <div class="code-tab" data-cv="cv35" data-pane="1">Test-Driven Iteration</div>
+          <div class="code-tab" data-cv="cv35" data-pane="2">Interview Pattern</div>
+          <div class="code-tab" data-cv="cv35" data-pane="3">Batching Strategy</div>
+        </div>
+        <div class="code-pane active" data-cv="cv35" data-idx="0"><div class="code-content"><span class="line"><span class="cm"># ❌ Prose (ambiguous):</span></span><span class="line"><span class="st">"Convert addresses to standardized format,</span></span><span class="line"><span class="st"> abbreviate street types, capitalize properly."</span></span><span class="line"></span><span class="line"><span class="cm"># ✅ Examples (unambiguous):</span></span><span class="line"></span><span class="line"><span class="vr">Input:</span>  <span class="st">"123 north main street, apt 4b, new york, ny 10001"</span></span><span class="line"><span class="vr">Output:</span> <span class="st">"123 N Main St, Apt 4B, New York, NY 10001"</span></span><span class="line"></span><span class="line"><span class="vr">Input:</span>  <span class="st">"456 WEST ELM BOULEVARD, SUITE 200, LOS ANGELES CA"</span></span><span class="line"><span class="vr">Output:</span> <span class="st">"456 W Elm Blvd, Ste 200, Los Angeles, CA"</span></span><span class="line"></span><span class="line"><span class="vr">Input:</span>  <span class="st">"789 oak ave., p.o. box 12, chicago, illinois 60601"</span></span><span class="line"><span class="vr">Output:</span> <span class="st">"789 Oak Ave, PO Box 12, Chicago, IL 60601"</span></span><span class="line"></span><span class="line"><span class="cm"># 3 examples implicitly communicate: abbreviation rules,</span></span><span class="line"><span class="cm"># capitalization, punctuation, state codes.</span></span><span class="line"><span class="cm"># Examples are case law (Domain 4).</span></span></div><div class="annotation"><div class="ann-icon">✎</div><div><strong style="color:var(--accent)">2-3 examples > paragraph of instructions.</strong> They implicitly communicate rules that would take paragraphs to describe in prose.</div></div></div>
+        <div class="code-pane" data-cv="cv35" data-idx="1"><div class="code-content"><span class="line"><span class="cm"># Step 1: Write tests FIRST</span></span><span class="line"></span><span class="line"><span class="kw">def</span> <span class="fn">test_parse_price_basic</span>():</span><span class="line">    <span class="kw">assert</span> <span class="fn">parse_price</span>(<span class="st">"$19.99"</span>) == <span class="nm">19.99</span></span><span class="line"></span><span class="line"><span class="kw">def</span> <span class="fn">test_parse_price_with_commas</span>():</span><span class="line">    <span class="kw">assert</span> <span class="fn">parse_price</span>(<span class="st">"$1,299.00"</span>) == <span class="nm">1299.00</span></span><span class="line"></span><span class="line"><span class="kw">def</span> <span class="fn">test_parse_price_euro_format</span>():</span><span class="line">    <span class="kw">assert</span> <span class="fn">parse_price</span>(<span class="st">"€1.299,00"</span>) == <span class="nm">1299.00</span></span><span class="line"></span><span class="line"><span class="kw">def</span> <span class="fn">test_parse_price_null</span>():</span><span class="line">    <span class="kw">assert</span> <span class="fn">parse_price</span>(<span class="kw">None</span>) == <span class="nm">0.00</span></span><span class="line"></span><span class="line"><span class="cm"># Step 2: Claude Code implements</span></span><span class="line"><span class="cm"># Step 3: 2 tests fail — share the failures:</span></span><span class="line"></span><span class="line"><span class="tg">FAILED</span> test_parse_price_euro_format</span><span class="line">  Expected: <span class="nm">1299.00</span>  Got: <span class="tg">ValueError</span></span><span class="line"></span><span class="line"><span class="tg">FAILED</span> test_parse_price_null</span><span class="line">  Expected: <span class="nm">0.00</span>  Got: <span class="tg">TypeError</span></span><span class="line"></span><span class="line"><span class="cm"># Step 4: Claude Code targets exactly these 2 cases</span></span><span class="line"><span class="cm"># Step 5: All green ✅</span></span></div><div class="annotation teal-ann"><div class="ann-icon">✓</div><div><strong style="color:var(--teal)">Test failures = unambiguous feedback.</strong> No interpretation gap. Claude Code knows exactly what's broken, what's expected, and can target the fix.</div></div></div>
+        <div class="code-pane" data-cv="cv35" data-idx="2"><div class="code-content"><span class="line"><span class="cm"># You tell Claude Code:</span></span><span class="line"><span class="st">"I need a caching layer for our product catalog.</span></span><span class="line"><span class="st"> Interview me first to surface what I haven't thought about."</span></span><span class="line"></span><span class="line"><span class="cm"># Claude Code asks:</span></span><span class="line"></span><span class="line"><span class="vr">1. Invalidation strategy</span></span><span class="line">   Time-based TTL? Event-based? Manual purge?</span><span class="line"></span><span class="line"><span class="vr">2. Consistency requirements</span></span><span class="line">   Is a 30-second stale price acceptable?</span><span class="line"></span><span class="line"><span class="vr">3. Cache miss under load</span></span><span class="line">   1000 requests hit empty cache — all query DB,</span><span class="line">   or use a lock/single-fill pattern?</span><span class="line"></span><span class="line"><span class="vr">4. Cold start after deployment</span></span><span class="line">   Warm up preemptively or fill on demand?</span><span class="line"></span><span class="line"><span class="vr">5. Memory limits</span></span><span class="line">   10K products × ~2KB = ~20MB.</span><span class="line">   Full catalog or LRU subset?</span><span class="line"></span><span class="line"><span class="cm"># You answer → Claude Code implements with full picture</span></span></div><div class="annotation purple-ann"><div class="ann-icon">?</div><div><strong style="color:var(--purple)">Plan mode for requirements.</strong> You knew you wanted caching. You hadn't thought about thundering herd or cold start. The interview prevents discover → rework → repeat.</div></div></div>
+        <div class="code-pane" data-cv="cv35" data-idx="3"><div class="code-content"><span class="line"><span class="cm"># ❌ WRONG: Independent issues batched together</span></span><span class="line"></span><span class="line"><span class="st">"Fix the typo in orders.py log message AND</span></span><span class="line"><span class="st"> add null check in auth.py"</span></span><span class="line"></span><span class="line"><span class="cm"># These are unrelated. Batching = complex diff for no reason.</span></span><span class="line"><span class="cm"># Do them SEQUENTIALLY (one at a time).</span></span><span class="line"></span><span class="line"></span><span class="line"><span class="cm"># ✅ RIGHT: Interacting issues batched together</span></span><span class="line"></span><span class="line"><span class="st">"In process_payment(), two changes:</span></span><span class="line"><span class="st"> 1. Change return type from dict → PaymentResult dataclass</span></span><span class="line"><span class="st"> 2. Update error handling to use PaymentResult.error</span></span><span class="line"><span class="st">    instead of raising exceptions</span></span><span class="line"><span class="st"> These interact — return type determines how errors</span></span><span class="line"><span class="st"> propagate. Handle together."</span></span><span class="line"></span><span class="line"><span class="cm"># If done sequentially: changing return type breaks</span></span><span class="line"><span class="cm"># error handling. Changing error handling first builds</span></span><span class="line"><span class="cm"># on a type that's about to change. Must be atomic.</span></span></div><div class="annotation red-ann"><div class="ann-icon">⚖</div><div><strong style="color:var(--red)">Interact → single message. Independent → sequential.</strong> Wrong choice causes cascading rework or unnecessarily complex diffs.</div></div></div>
+      </div>
+      <div class="concept-box">
+        <h4>Ambiguity → Precision</h4>
+        <div class="concept-row"><span class="concept-label cl-purple">Interview</span><span>Discover unknowns</span></div>
+        <div class="concept-row"><span class="concept-label cl-teal">Tests</span><span>Define correctness</span></div>
+        <div class="concept-row"><span class="concept-label cl-orange">Examples</span><span>Clarify judgment</span></div>
+        <div class="concept-row"><span class="concept-label cl-red">Batching</span><span>Fix efficiently</span></div>
+      </div>`
+  },
+  {
+    id: "cicd", label: "3.6 CI/CD", title: "CI/CD Integration", num: "TASK 3.6",
+    desc: "Running Claude Code unattended. Non-interactive mode, structured output, session isolation.",
+    content: `
+      <div id="cv36" class="code-viewer">
+        <div class="code-tab-bar">
+          <div class="code-tab active" data-cv="cv36" data-pane="0">PR Review Pipeline</div>
+          <div class="code-tab" data-cv="cv36" data-pane="1">Test Generation</div>
+          <div class="code-tab" data-cv="cv36" data-pane="2">Re-Review (no duplicates)</div>
+          <div class="code-tab" data-cv="cv36" data-pane="3">CLAUDE.md for CI</div>
+        </div>
+        <div class="code-pane active" data-cv="cv36" data-idx="0"><div class="code-content"><span class="line"><span class="cm"># .github/workflows/pr-review.yml</span></span><span class="line"></span><span class="line"><span class="at">name</span>: <span class="st">Claude Code PR Review</span></span><span class="line"><span class="at">on</span>: [<span class="st">pull_request</span>]</span><span class="line"></span><span class="line"><span class="at">jobs</span>:</span><span class="line">  <span class="at">review</span>:</span><span class="line">    <span class="at">runs-on</span>: <span class="st">ubuntu-latest</span></span><span class="line">    <span class="at">steps</span>:</span><span class="line">      - <span class="at">uses</span>: <span class="st">actions/checkout@v4</span></span><span class="line"></span><span class="line">      - <span class="at">name</span>: <span class="st">Run Claude Code Review</span></span><span class="line">        <span class="at">run</span>: |</span><span class="line">          claude <span class="kw">-p</span> \</span><span class="line">            <span class="kw">--output-format</span> <span class="st">json</span> \</span><span class="line">            <span class="kw">--json-schema</span> <span class="st">review-schema.json</span> \</span><span class="line">            <span class="st">"Review this PR. Focus on security,</span></span><span class="line"><span class="st">             performance, error handling.</span></span><span class="line"><span class="st">             Report file, line, severity, fix."</span></span><span class="line"></span><span class="line">      - <span class="at">name</span>: <span class="st">Post Review Comments</span></span><span class="line">        <span class="at">run</span>: <span class="fn">./scripts/post-review-comments.sh</span></span></div><div class="annotation"><div class="ann-icon">▶</div><div><strong style="color:var(--accent)">Three flags:</strong> <code>-p</code> prevents hangs. <code>--output-format json</code> for machines. <code>--json-schema</code> enforces exact shape. This is a SEPARATE session from the code author — no self-review bias.</div></div></div>
+        <div class="code-pane" data-cv="cv36" data-idx="1"><div class="code-content"><span class="line"><span class="cm"># CI: Generate tests — include existing to avoid duplicates</span></span><span class="line"></span><span class="line"><span class="at">- name</span>: <span class="st">Generate Missing Tests</span></span><span class="line">  <span class="at">run</span>: |</span><span class="line">    <span class="vr">EXISTING_TESTS</span>=$(<span class="fn">find</span> . -name "*.test.*" -type f)</span><span class="line"></span><span class="line">    claude <span class="kw">-p</span> \</span><span class="line">      <span class="st">"Generate tests for changed files in this PR.</span></span><span class="line"></span><span class="line"><span class="st">       These test files ALREADY EXIST — don't duplicate:</span></span><span class="line"><span class="st">       $EXISTING_TESTS</span></span><span class="line"></span><span class="line"><span class="st">       Focus ONLY on:</span></span><span class="line"><span class="st">       - New functions not yet covered</span></span><span class="line"><span class="st">       - Missing edge cases</span></span><span class="line"><span class="st">       - Untested error paths</span></span><span class="line"></span><span class="line"><span class="st">       Follow testing conventions in CLAUDE.md."</span></span></div><div class="annotation teal-ann"><div class="ann-icon">✓</div><div><strong style="color:var(--teal)">Full context upfront:</strong> No human to say "we already have that." Existing tests in the prompt prevents duplication. CLAUDE.md provides standards.</div></div></div>
+        <div class="code-pane" data-cv="cv36" data-idx="2"><div class="code-content"><span class="line"><span class="cm"># Re-review after new commits — prevent duplicate comments</span></span><span class="line"></span><span class="line"><span class="at">- name</span>: <span class="st">Re-Review Updated PR</span></span><span class="line">  <span class="at">run</span>: |</span><span class="line">    <span class="vr">PRIOR</span>=$(<span class="fn">gh</span> api "/repos/.../pulls/.../comments")</span><span class="line"></span><span class="line">    claude <span class="kw">-p</span> \</span><span class="line">      <span class="kw">--output-format</span> <span class="st">json</span> \</span><span class="line">      <span class="kw">--json-schema</span> <span class="st">review-schema.json</span> \</span><span class="line">      <span class="st">"Review latest changes in this PR.</span></span><span class="line"></span><span class="line"><span class="st">       PREVIOUS FINDINGS (already posted):</span></span><span class="line"><span class="st">       $PRIOR</span></span><span class="line"></span><span class="line"><span class="st">       INSTRUCTIONS:</span></span><span class="line"><span class="st">       - Report ONLY new or still-unaddressed issues</span></span><span class="line"><span class="st">       - Do NOT re-report issues listed above</span></span><span class="line"><span class="st">       - If a flagged issue was fixed, skip it"</span></span></div><div class="annotation purple-ann"><div class="ann-icon">🔁</div><div><strong style="color:var(--purple)">Prior findings prevent noise.</strong> Without them, Claude Code flags the same issues again. Explicit "only new" instruction + prior context keeps PR threads clean.</div></div></div>
+        <div class="code-pane" data-cv="cv36" data-idx="3"><div class="code-content"><span class="line"><span class="cm"># .claude/CLAUDE.md — CI-relevant sections</span></span><span class="line"><span class="cm"># In CI, this is ALL Claude Code has. No human to fill gaps.</span></span><span class="line"></span><span class="line"><span class="cm">## Testing Standards</span></span><span class="line">- A "valuable" test covers behavior, not implementation</span><span class="line">- Don't test private methods</span><span class="line">- Every test must be independently runnable</span><span class="line"></span><span class="line"><span class="cm">## Available Test Fixtures</span></span><span class="line">- <span class="fn">createMockUser()</span> — user with all required fields</span><span class="line">- <span class="fn">createMockOrder()</span> — order linked to mock user</span><span class="line">- <span class="fn">seedTestDB()</span> — standard dataset</span><span class="line">- <span class="fn">mockStripeAPI()</span> — intercepts Stripe, returns success</span><span class="line"></span><span class="line"><span class="cm">## Review Criteria</span></span><span class="line">- Flag functions > 50 lines</span><span class="line">- Flag SQL without parameterization</span><span class="line">- Flag missing error handling in async</span><span class="line">- Flag TODO/FIXME older than 2 sprints</span><span class="line"></span><span class="line"><span class="cm">## CI-Specific</span></span><span class="line">- Redis test instance: localhost:<span class="nm">6380</span></span><span class="line">- Test DB credentials in CI env variables</span></div><div class="annotation red-ann"><div class="ann-icon">⚠</div><div><strong style="color:var(--red)">CLAUDE.md is the sole context in CI.</strong> Undocumented fixtures = duplicated fixtures. Missing review criteria = generic reviews. Document everything CI needs.</div></div></div>
+      </div>
+      <div class="concept-box">
+        <h4>CI Session Isolation</h4>
+        <div class="flow-visual">
+          <div class="flow-box fb-orange">Session 1: Author</div><div class="flow-arrow">→</div>
+          <div class="flow-box fb-teal">Opens PR</div><div class="flow-arrow">→</div>
+          <div class="flow-box fb-purple">Session 2: CI Review</div>
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-dim);margin-top:12px;">Fresh session = fresh eyes. No confirmation bias. Same isolation principle as <code>context: fork</code>.</p>
+      </div>`
+  }
+];
+
+// Build nav + panels
+const navEl = document.getElementById('sectionNav');
+const mainEl = document.getElementById('mainContent');
+sections.forEach((s, i) => {
+  const btn = document.createElement('div');
+  btn.className = 'section-btn' + (i === 0 ? ' active' : '');
+  btn.dataset.idx = i;
+  btn.textContent = s.label;
+  navEl.appendChild(btn);
+
+  const panel = document.createElement('div');
+  panel.className = 'panel' + (i === 0 ? ' active' : '');
+  panel.dataset.idx = i;
+  panel.innerHTML = '<div class="task-header"><div class="task-num">'+s.num+'</div><h2>'+s.title+'</h2><p class="task-desc">'+s.desc+'</p></div>'+s.content;
+  mainEl.appendChild(panel);
+});
+
+navEl.addEventListener('click', e => {
+  const btn = e.target.closest('.section-btn');
+  if (!btn) return;
+  const idx = btn.dataset.idx;
+  document.querySelectorAll('.section-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelector('.panel[data-idx="'+idx+'"]').classList.add('active');
+  window.scrollTo({ top: navEl.offsetTop, behavior: 'smooth' });
+});
+
+document.addEventListener('click', e => {
+  const tab = e.target.closest('.code-tab');
+  if (!tab) return;
+  const cv = tab.dataset.cv, pane = tab.dataset.pane;
+  document.querySelectorAll('.code-tab[data-cv="'+cv+'"]').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.code-pane[data-cv="'+cv+'"]').forEach(p => p.classList.remove('active'));
+  tab.classList.add('active');
+  document.querySelector('.code-pane[data-cv="'+cv+'"][data-idx="'+pane+'"]').classList.add('active');
+});
+</script>
+</body>
+</html>

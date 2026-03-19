@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain 2 — Tool Design & MCP Integration</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,700;9..144,900&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e1117;
+    --bg-card: #161b22;
+    --bg-card-hover: #1c2230;
+    --bg-code: #0d1117;
+    --border: #30363d;
+    --border-accent: #c084fc;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent: #c084fc;
+    --accent-soft: rgba(192, 132, 252, 0.12);
+    --accent-glow: rgba(192, 132, 252, 0.25);
+    --green: #7ee787;
+    --green-soft: rgba(126, 231, 135, 0.12);
+    --red: #ff7b72;
+    --red-soft: rgba(255, 123, 114, 0.10);
+    --amber: #f0b94d;
+    --amber-soft: rgba(240, 185, 77, 0.12);
+    --blue: #79c0ff;
+    --blue-soft: rgba(121, 192, 255, 0.12);
+    --cyan: #56d4dd;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-weight: 300;
+    overflow-x: hidden;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    position: relative;
+    padding: 80px 40px 60px;
+    text-align: center;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%; transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
+    pointer-events: none;
+    opacity: 0.5;
+  }
+  .hero-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 5px 16px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+    background: var(--accent-soft);
+  }
+  .hero h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    line-height: 1.15;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, var(--text) 40%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ── NAV ── */
+  .toc {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 48px 24px 20px;
+  }
+  .toc-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 10px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 0.88rem;
+    font-weight: 400;
+    transition: all 0.2s;
+  }
+  .toc-item:hover {
+    background: var(--bg-card);
+    border-color: var(--border);
+  }
+  .toc-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    min-width: 28px; height: 28px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 7px;
+    font-weight: 500;
+  }
+
+  /* ── CONTENT ── */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+
+  /* Section */
+  .section {
+    margin-top: 72px;
+    scroll-margin-top: 40px;
+  }
+  .section-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .section h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: 1.75rem;
+    line-height: 1.3;
+    margin-bottom: 12px;
+  }
+  .section-intro {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 32px;
+    max-width: 680px;
+  }
+
+  h3 {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin: 36px 0 12px;
+    color: var(--text);
+  }
+
+  p { margin-bottom: 14px; font-size: 0.93rem; }
+
+  /* Code blocks */
+  pre {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    margin: 16px 0 24px;
+    overflow-x: auto;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+  pre .kw { color: var(--accent); }
+  pre .str { color: var(--green); }
+  pre .cmt { color: var(--text-dim); font-style: italic; }
+  pre .fn { color: var(--blue); }
+  pre .val { color: var(--amber); }
+  pre .err { color: var(--red); }
+
+  code {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.84em;
+    background: var(--accent-soft);
+    color: var(--accent);
+    padding: 2px 7px;
+    border-radius: 5px;
+  }
+
+  /* Cards */
+  .card-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 20px 0 28px;
+  }
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px 20px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: var(--accent); }
+  .card-icon {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  .card h4 {
+    font-weight: 600;
+    font-size: 0.92rem;
+    margin-bottom: 6px;
+  }
+  .card p {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  /* Good/bad comparison */
+  .compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0 28px;
+  }
+  @media (max-width: 600px) { .compare { grid-template-columns: 1fr; } }
+  .compare-block {
+    border-radius: 10px;
+    padding: 18px 20px;
+    border: 1px solid;
+  }
+  .compare-block.bad {
+    background: var(--red-soft);
+    border-color: rgba(255, 123, 114, 0.25);
+  }
+  .compare-block.good {
+    background: var(--green-soft);
+    border-color: rgba(126, 231, 135, 0.25);
+  }
+  .compare-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  .compare-block.bad .compare-label { color: var(--red); }
+  .compare-block.good .compare-label { color: var(--green); }
+  .compare-block pre {
+    background: rgba(0,0,0,0.25);
+    border: none;
+    margin: 0;
+    padding: 14px;
+    font-size: 12px;
+  }
+
+  /* Callout */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-soft);
+    padding: 18px 22px;
+    border-radius: 0 10px 10px 0;
+    margin: 24px 0;
+    font-size: 0.9rem;
+  }
+  .callout.amber {
+    border-left-color: var(--amber);
+    background: var(--amber-soft);
+  }
+  .callout strong { color: var(--text); font-weight: 600; }
+
+  /* Table */
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0 28px;
+    font-size: 0.85rem;
+  }
+  .ref-table th {
+    text-align: left;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  .ref-table td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+  .ref-table tr:last-child td { border-bottom: none; }
+  .ref-table td:first-child {
+    font-family: 'DM Mono', monospace;
+    color: var(--accent);
+    font-size: 0.84em;
+    white-space: nowrap;
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 20px 0;
+    font-family: 'DM Mono', monospace;
+    font-size: 13px;
+  }
+  .flow-node {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 8px;
+  }
+  .flow-arrow { color: var(--text-dim); }
+
+  /* Analogy box */
+  .analogy {
+    background: var(--blue-soft);
+    border: 1px solid rgba(121, 192, 255, 0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin: 24px 0;
+  }
+  .analogy-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--blue);
+    margin-bottom: 8px;
+  }
+  .analogy p { margin: 0; font-size: 0.9rem; color: var(--text-muted); }
+
+  /* Separator */
+  hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 60px 0 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding: 40px 24px 60px;
+    color: var(--text-dim);
+    font-size: 0.8rem;
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<div class="hero">
+  <div class="hero-badge">Certification Study Guide</div>
+  <h1>Tool Design &<br>MCP Integration</h1>
+  <p>Domain 2 of the Claude Agent SDK Certification — covering tool descriptions, error handling, tool distribution, tool_choice, MCP servers, and built-in tools.</p>
+</div>
+
+<!-- ═══════════════ TOC ═══════════════ -->
+<div class="toc">
+  <div class="toc-label">Sections</div>
+  <div class="toc-grid">
+    <a href="#s1" class="toc-item"><span class="toc-num">01</span> Tool Descriptions — Claude's Compass</a>
+    <a href="#s2" class="toc-item"><span class="toc-num">02</span> Anatomy of a Great Description</a>
+    <a href="#s3" class="toc-item"><span class="toc-num">03</span> System Prompt Sabotage</a>
+    <a href="#s4" class="toc-item"><span class="toc-num">04</span> Structured Error Responses</a>
+    <a href="#s5" class="toc-item"><span class="toc-num">05</span> Error Recovery in Multi-Agent Systems</a>
+    <a href="#s6" class="toc-item"><span class="toc-num">06</span> Tool Distribution — Less Is More</a>
+    <a href="#s7" class="toc-item"><span class="toc-num">07</span> tool_choice Configuration</a>
+    <a href="#s8" class="toc-item"><span class="toc-num">08</span> MCP Server Integration</a>
+    <a href="#s9" class="toc-item"><span class="toc-num">09</span> Built-In Tools</a>
+  </div>
+</div>
+
+<!-- ═══════════════ CONTENT ═══════════════ -->
+<div class="container">
+
+<!-- ─── SECTION 1 ─── -->
+<div class="section" id="s1">
+  <div class="section-tag">Task 2.1</div>
+  <h2>Tool Descriptions — Claude's Decision-Making Compass</h2>
+  <p class="section-intro">Claude doesn't see your code. It reads tool descriptions to decide which tool to use. When descriptions are vague or overlapping, Claude guesses — and guesses wrong.</p>
+
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Vague & Overlapping</div>
+      <pre><span class="str">"analyze_content"</span>
+<span class="cmt">"Analyzes content and returns results"</span>
+
+<span class="str">"analyze_document"</span>
+<span class="cmt">"Analyzes a document and provides analysis"</span></pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Clear & Differentiated</div>
+      <pre><span class="str">"extract_web_results"</span>
+<span class="cmt">"Extracts structured data from search
+result pages. Input: raw HTML. Output:
+JSON array of {title, url, snippet}.
+Use instead of summarize_content for
+search engine output."</span></pre>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>Rule of thumb:</strong> If you can't tell two tools apart by reading their descriptions alone, neither can Claude.
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 2 ─── -->
+<div class="section" id="s2">
+  <div class="section-tag">Task 2.1</div>
+  <h2>Anatomy of a Bulletproof Tool Description</h2>
+  <p class="section-intro">Five ingredients separate great descriptions from bad ones.</p>
+
+  <div class="card-row">
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h4>Purpose Statement</h4>
+      <p>One clear sentence on what the tool does.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📥</div>
+      <h4>Input Format</h4>
+      <p>What does Claude need to feed this tool?</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📤</div>
+      <h4>Output Format</h4>
+      <p>What comes back?</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚠️</div>
+      <h4>Edge Cases</h4>
+      <p>What happens with weird or empty input?</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚧</div>
+      <h4>Boundary Explanation</h4>
+      <p>When to use this tool <em>instead of</em> another.</p>
+    </div>
+  </div>
+
+  <h3>All Five in Action</h3>
+  <pre><span class="str">"verify_claim_against_source"</span>
+
+<span class="cmt">PURPOSE:</span>   <span class="str">"Checks whether a factual claim is supported
+           by a given source document."</span>
+
+<span class="cmt">INPUT:</span>    <span class="str">"JSON with 'claim' (string, one sentence)
+           and 'source_text' (string, full text)."</span>
+
+<span class="cmt">OUTPUT:</span>   <span class="str">"JSON with 'supported' (bool), 'confidence'
+           (0.0-1.0), and 'relevant_excerpt' (string)."</span>
+
+<span class="cmt">EDGE:</span>     <span class="str">"Returns supported=false, confidence=0.0 if
+           source is empty or claim not addressed."</span>
+
+<span class="cmt">BOUNDARY:</span> <span class="str">"Use this for fact-checking a single claim.
+           Use summarize_content for overviews.
+           Use extract_data_points for structured data."</span></pre>
+
+  <h3>Split Generic Tools Into Specialists</h3>
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ One Generic Tool</div>
+      <pre><span class="fn">analyze_document</span>
+<span class="cmt">Does everything vaguely — Claude
+has to guess which behavior you want</span></pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Purpose-Specific Tools</div>
+      <pre><span class="fn">extract_data_points</span>  <span class="cmt">→ structured fields</span>
+<span class="fn">summarize_content</span>    <span class="cmt">→ overviews</span>
+<span class="fn">verify_claim</span>         <span class="cmt">→ fact-checking</span></pre>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 Mental Model</div>
+    <p>Hiring three specialists (plumber, electrician, painter) instead of one generalist. Each knows their lane — results are better across the board.</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 3 ─── -->
+<div class="section" id="s3">
+  <div class="section-tag">Task 2.1</div>
+  <h2>System Prompt Sabotage</h2>
+  <p class="section-intro">Perfect tool descriptions can still fail if your system prompt contains keywords that accidentally create tool associations.</p>
+
+  <h3>The Keyword Magnet Problem</h3>
+  <pre><span class="cmt"># System prompt contains:</span>
+<span class="str">"Always analyze content before responding."</span>
+
+<span class="cmt"># Tool name happens to be:</span>
+<span class="fn">analyze_content</span>
+
+<span class="cmt"># Result: Claude gravitates to this tool
+# regardless of context, because the keyword
+# match is strongest.</span></pre>
+
+  <h3>The Two-Step Audit</h3>
+  <div class="card-row">
+    <div class="card">
+      <h4>Step 1: Scan for Action Verbs</h4>
+      <p>Find words like "analyze," "search," "check," "extract," "look up" in your system prompt. These are the magnets.</p>
+    </div>
+    <div class="card">
+      <h4>Step 2: Cross-Reference Tool Names</h4>
+      <p>If any of those verbs match a tool name or description, you have a potential collision. Reword the system prompt.</p>
+    </div>
+  </div>
+
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Keyword Collision</div>
+      <pre><span class="cmt">System prompt:</span>
+  <span class="str">"Always <span class="err">analyze content</span> carefully..."</span>
+<span class="cmt">Tool name:</span>
+  <span class="fn"><span class="err">analyze_content</span></span></pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Neutral Language</div>
+      <pre><span class="cmt">System prompt:</span>
+  <span class="str">"Be thorough when processing requests..."</span>
+<span class="cmt">Tool name:</span>
+  <span class="fn">extract_web_results</span></pre>
+    </div>
+  </div>
+
+  <div class="callout">
+    <strong>The Golden Rule:</strong> System prompts define <em>behaviors and goals</em>. Tool descriptions handle <em>tool selection</em>. Don't let them bleed into each other.
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 4 ─── -->
+<div class="section" id="s4">
+  <div class="section-tag">Task 2.2</div>
+  <h2>Structured Error Responses</h2>
+  <p class="section-intro">When a tool fails, does it give Claude enough information to recover intelligently? Generic errors lead to generic (bad) recovery.</p>
+
+  <h3>Four Error Categories</h3>
+  <div class="card-row">
+    <div class="card">
+      <div class="card-icon">⏳</div>
+      <h4>Transient</h4>
+      <p>Server timeout, temporary unavailability. <strong>Retryable.</strong></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🚫</div>
+      <h4>Validation</h4>
+      <p>Malformed input, wrong data type. <strong>Not retryable</strong> without fixing input.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📋</div>
+      <h4>Business</h4>
+      <p>Policy violation, rule blocked. <strong>Not retryable.</strong></p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🔒</div>
+      <h4>Permission</h4>
+      <p>No access to this resource. <strong>Not retryable</strong> without escalation.</p>
+    </div>
+  </div>
+
+  <h3>Generic vs Structured Error</h3>
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Generic — Useless</div>
+      <pre>{
+  <span class="kw">"isError"</span>: <span class="val">true</span>,
+  <span class="kw">"content"</span>: <span class="str">"Operation failed"</span>
+}</pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Structured — Actionable</div>
+      <pre>{
+  <span class="kw">"isError"</span>: <span class="val">true</span>,
+  <span class="kw">"content"</span>: <span class="str">"Order below $50 minimum"</span>,
+  <span class="kw">"metadata"</span>: {
+    <span class="kw">"errorCategory"</span>: <span class="str">"business"</span>,
+    <span class="kw">"isRetryable"</span>: <span class="val">false</span>,
+    <span class="kw">"customerMessage"</span>: <span class="str">"Discounts
+      require orders of $50+"</span>,
+    <span class="kw">"currentTotal"</span>: <span class="val">32.99</span>
+  }
+}</pre>
+    </div>
+  </div>
+
+  <h3>Critical Gotcha: Empty Results ≠ Errors</h3>
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Empty = Error (Wrong)</div>
+      <pre>{
+  <span class="kw">"isError"</span>: <span class="val">true</span>,
+  <span class="kw">"content"</span>: <span class="str">"No customers found"</span>
+}
+<span class="cmt">Claude may retry or apologize for a "failure"</span></pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Empty = Valid Result (Correct)</div>
+      <pre>{
+  <span class="kw">"isError"</span>: <span class="val">false</span>,
+  <span class="kw">"content"</span>: <span class="str">"0 customers matched"</span>,
+  <span class="kw">"results"</span>: []
+}
+<span class="cmt">Claude treats this as useful information</span></pre>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 Mental Model</div>
+    <p>Think of error responses like a doctor's diagnosis. "Something's wrong" isn't helpful. "Sprained ankle, no surgery needed, rest for two weeks" — now you know exactly what to do.</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 5 ─── -->
+<div class="section" id="s5">
+  <div class="section-tag">Task 2.2</div>
+  <h2>Error Recovery in Multi-Agent Systems</h2>
+  <p class="section-intro">Who handles the error — the subagent or the coordinator? It depends on the error type.</p>
+
+  <h3>The Principle: Handle Locally, Escalate Strategically</h3>
+  <div class="card-row">
+    <div class="card">
+      <div class="card-icon">🔄</div>
+      <h4>Subagent Handles</h4>
+      <p>Transient failures — retry once or twice locally. Only escalate if still failing.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">📡</div>
+      <h4>Coordinator Handles</h4>
+      <p>Errors the subagent can't resolve, workflow-affecting failures, skip/reroute/abort decisions.</p>
+    </div>
+  </div>
+
+  <h3>Escalation Includes Context</h3>
+  <p>When local recovery fails, the subagent sends the coordinator everything it knows:</p>
+  <pre>{
+  <span class="kw">"isError"</span>: <span class="val">true</span>,
+  <span class="kw">"content"</span>: <span class="str">"Customer API timed out after 2 retries"</span>,
+  <span class="kw">"metadata"</span>: {
+    <span class="kw">"errorCategory"</span>: <span class="str">"transient"</span>,
+    <span class="kw">"isRetryable"</span>: <span class="val">true</span>,
+    <span class="kw">"attemptsMade"</span>: <span class="val">2</span>,
+    <span class="kw">"partialResults"</span>: <span class="val">null</span>,
+    <span class="kw">"whatWasAttempted"</span>: <span class="str">"GET /customers/{id}"</span>
+  }
+}</pre>
+
+  <h3>Preserve Partial Results</h3>
+  <p>If 2 of 3 lookups succeed, send back what you got. Never discard good work because of one failure.</p>
+  <pre>{
+  <span class="kw">"partialResults"</span>: {
+    <span class="kw">"customerProfile"</span>: { <span class="str">"name"</span>: <span class="str">"Jane"</span>, <span class="str">"tier"</span>: <span class="str">"gold"</span> },  <span class="cmt">✓</span>
+    <span class="kw">"orderHistory"</span>: [{ <span class="str">"id"</span>: <span class="str">"ORD-123"</span> }],              <span class="cmt">✓</span>
+    <span class="kw">"supportTickets"</span>: <span class="val">null</span>                              <span class="cmt">✗ failed</span>
+  },
+  <span class="kw">"failedStep"</span>: <span class="str">"supportTickets"</span>
+}</pre>
+
+  <div class="callout">
+    <strong>The coordinator's decision tree:</strong> Enough partial results to answer? → Deliver them. Can reroute to fallback? → Try it. Non-retryable error? → Inform user. Never silently drop information.
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 6 ─── -->
+<div class="section" id="s6">
+  <div class="section-tag">Task 2.3</div>
+  <h2>Tool Distribution — Less Is More</h2>
+  <p class="section-intro">More tools means worse decisions. Each agent should only have tools relevant to its role.</p>
+
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Overloaded — 18 Tools</div>
+      <pre><span class="fn">synthesis_agent</span> = Agent(
+  tools=[
+    <span class="str">"merge_findings"</span>,
+    <span class="str">"generate_summary"</span>,
+    <span class="str">"web_search"</span>,       <span class="cmt"># not its job!</span>
+    <span class="str">"fetch_url"</span>,        <span class="cmt"># not its job!</span>
+    <span class="cmt">... 14 more ...</span>
+  ]
+)</pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Scoped — 2-3 Tools</div>
+      <pre><span class="fn">synthesis_agent</span> = Agent(
+  tools=[
+    <span class="str">"merge_findings"</span>,
+    <span class="str">"generate_summary"</span>,
+    <span class="str">"verify_fact"</span>,  <span class="cmt"># scoped cross-role</span>
+  ]
+)</pre>
+    </div>
+  </div>
+
+  <h3>Scoped Tool Access by Role</h3>
+  <table class="ref-table">
+    <tr><th>Agent</th><th>Tools</th></tr>
+    <tr><td>research</td><td>web_search, fetch_url, extract_data</td></tr>
+    <tr><td>analysis</td><td>run_query, compute_stats, generate_chart</td></tr>
+    <tr><td>synthesis</td><td>merge_findings, generate_summary</td></tr>
+    <tr><td>coordinator</td><td>delegate_to_agent (no domain tools)</td></tr>
+  </table>
+
+  <h3>Constrained Alternatives</h3>
+  <p>When a specialized agent needs limited cross-role access, replace the generic tool with a constrained version:</p>
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Generic</div>
+      <pre>tools=[<span class="str">"fetch_url"</span>]
+<span class="cmt">Agent can fetch ANY URL — dangerous</span></pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ Constrained</div>
+      <pre>tools=[<span class="str">"load_document"</span>]
+<span class="cmt">Only accepts validated document URLs</span></pre>
+    </div>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">💡 Mental Model</div>
+    <p>A kitchen: the pastry chef has whisks and piping bags. The sushi chef has knives and a bamboo mat. You <em>could</em> give both every tool — but the pastry chef doesn't need a sushi knife, and handing them one invites accidents.</p>
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 7 ─── -->
+<div class="section" id="s7">
+  <div class="section-tag">Task 2.3</div>
+  <h2>tool_choice Configuration</h2>
+  <p class="section-intro">Three modes that control whether and which tool Claude calls.</p>
+
+  <div class="card-row">
+    <div class="card">
+      <div class="card-icon">🤖</div>
+      <h4>"auto"</h4>
+      <p>Claude decides whether to call a tool and which one. Default mode — best for open-ended tasks.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">⚡</div>
+      <h4>"any"</h4>
+      <p>Claude MUST call a tool, but picks which. Prevents conversational responses when action is needed.</p>
+    </div>
+    <div class="card">
+      <div class="card-icon">🎯</div>
+      <h4>Forced</h4>
+      <p>Claude MUST call THIS specific tool. Guarantees a step runs — used for enforcing pipeline order.</p>
+    </div>
+  </div>
+
+  <h3>Forced → Then Release: The Key Pattern</h3>
+  <pre><span class="cmt"># Turn 1: Force metadata extraction first</span>
+response = client.messages.create(
+    tools=[extract_metadata, enrich, validate],
+    <span class="kw">tool_choice</span>={<span class="str">"type"</span>: <span class="str">"tool"</span>, <span class="str">"name"</span>: <span class="str">"extract_metadata"</span>}
+)
+
+<span class="cmt"># Turn 2: Now let Claude choose freely</span>
+response = client.messages.create(
+    tools=[enrich, validate],
+    <span class="kw">tool_choice</span>={<span class="str">"type"</span>: <span class="str">"auto"</span>}
+)</pre>
+
+  <div class="callout amber">
+    <strong>Don't force every step.</strong> If you're forcing every single tool call, you've built a script, not an agent. Force only the steps that <em>must</em> happen, then let Claude reason about the rest.
+  </div>
+
+  <h3>Decision Framework</h3>
+  <table class="ref-table">
+    <tr><th>Question</th><th>Answer</th></tr>
+    <tr><td>Need Claude to always act?</td><td>tool_choice: <code>"any"</code></td></tr>
+    <tr><td>Specific tool must run first?</td><td>Forced, then switch to <code>"auto"</code></td></tr>
+    <tr><td>Claude choosing well on its own?</td><td>tool_choice: <code>"auto"</code> (default)</td></tr>
+    <tr><td>Claude choosing poorly?</td><td>Fix tool descriptions first — force as last resort</td></tr>
+  </table>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 8 ─── -->
+<div class="section" id="s8">
+  <div class="section-tag">Task 2.4</div>
+  <h2>MCP Server Integration</h2>
+  <p class="section-intro">How external tools actually connect to Claude through MCP servers — configuration, scoping, and best practices.</p>
+
+  <h3>What's an MCP Server?</h3>
+  <div class="flow">
+    <span class="flow-node">Claude Agent</span>
+    <span class="flow-arrow">←→</span>
+    <span class="flow-node" style="border-color: var(--accent);">MCP Server</span>
+    <span class="flow-arrow">←→</span>
+    <span class="flow-node">External Service</span>
+  </div>
+  <p>A translator between Claude and external services. Tools are <strong>discovered at connection time</strong> — no manual registration needed.</p>
+
+  <h3>Project vs User Scope</h3>
+  <div class="card-row">
+    <div class="card">
+      <h4><code>.mcp.json</code></h4>
+      <p>Project-level. Committed to version control. Shared with the whole team. Use for Jira, GitHub, shared DBs.</p>
+    </div>
+    <div class="card">
+      <h4><code>~/.claude.json</code></h4>
+      <p>User-level. Personal to you. Use for experiments and tools you're testing before proposing to the team.</p>
+    </div>
+  </div>
+
+  <h3>Configuration with Env Var Expansion</h3>
+  <pre><span class="cmt">// .mcp.json — safe to commit (no actual secrets)</span>
+{
+  <span class="kw">"mcpServers"</span>: {
+    <span class="str">"github-server"</span>: {
+      <span class="kw">"command"</span>: <span class="str">"npx"</span>,
+      <span class="kw">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"@mcp/server-github"</span>],
+      <span class="kw">"env"</span>: {
+        <span class="kw">"GITHUB_TOKEN"</span>: <span class="str">"${GITHUB_TOKEN}"</span>  <span class="cmt">← from .env</span>
+      }
+    }
+  }
+}</pre>
+
+  <h3>Community vs Custom Servers</h3>
+  <table class="ref-table">
+    <tr><th>Need</th><th>Approach</th></tr>
+    <tr><td>Jira / GitHub / Slack</td><td>Use existing community MCP server ✓</td></tr>
+    <tr><td>Standard integration</td><td>Community server — don't reinvent it ✓</td></tr>
+    <tr><td>Proprietary internal tool</td><td>Build a custom MCP server ✓</td></tr>
+  </table>
+
+  <h3>Enhance MCP Tool Descriptions</h3>
+  <p>Claude prefers its built-in tools (like Grep) when MCP tool descriptions are vague. The fix: tell Claude explicitly when the MCP tool is better.</p>
+  <pre><span class="cmt">// Vague — Claude ignores it, uses Grep instead</span>
+<span class="str">"Searches code"</span>
+
+<span class="cmt">// Detailed — Claude understands the advantage</span>
+<span class="str">"Semantic search across the full codebase using
+embeddings. Finds conceptually related code even
+without exact keyword matches.
+Use <span class="kw">over Grep</span> when searching by concept."</span></pre>
+
+  <h3>MCP Resources: The Table of Contents</h3>
+  <div class="compare">
+    <div class="compare-block bad">
+      <div class="compare-label">✗ Without Resources</div>
+      <pre><span class="cmt">10 exploratory tool calls just to
+understand what data is available</span>
+
+list_issues() → 50 results
+get_issue(1) → read
+get_issue(2) → read
+...</pre>
+    </div>
+    <div class="compare-block good">
+      <div class="compare-label">✓ With Resources</div>
+      <pre><span class="cmt">Browse the catalog first, then go
+straight to the relevant item</span>
+
+<span class="fn">resource:</span> issue_summaries → scan
+get_issue(<span class="val">47</span>) → the one that matters</pre>
+    </div>
+  </div>
+</div>
+
+<hr>
+
+<!-- ─── SECTION 9 ─── -->
+<div class="section" id="s9">
+  <div class="section-tag">Task 2.5</div>
+  <h2>Built-In Tools</h2>
+  <p class="section-intro">Six built-in tools, each with a specific sweet spot. Using the wrong one wastes time and context.</p>
+
+  <h3>The Lineup</h3>
+  <table class="ref-table">
+    <tr><th>Tool</th><th>Purpose</th></tr>
+    <tr><td>Grep</td><td>Search <strong>inside</strong> files — find function names, error messages, import statements</td></tr>
+    <tr><td>Glob</td><td>Search <strong>for</strong> files — match by name or extension pattern (e.g., **/*.test.tsx)</td></tr>
+    <tr><td>Read</td><td>Load a file's full contents into context</td></tr>
+    <tr><td>Write</td><td>Create or fully overwrite a file</td></tr>
+    <tr><td>Edit</td><td>Surgically modify a specific part of a file (requires unique text match)</td></tr>
+    <tr><td>Bash</td><td>Run any shell command (tests, installs, scripts)</td></tr>
+  </table>
+
+  <h3>Grep vs Glob — The Key Distinction</h3>
+  <div class="compare">
+    <div class="compare-block good" style="background: var(--accent-soft); border-color: rgba(192,132,252,0.25);">
+      <div class="compare-label" style="color: var(--accent);">Grep = What's INSIDE files?</div>
+      <pre><span class="cmt">"Where is calculateTotal defined?"</span>
+grep -r <span class="str">"calculateTotal"</span> src/</pre>
+    </div>
+    <div class="compare-block good" style="background: var(--blue-soft); border-color: rgba(121,192,255,0.25);">
+      <div class="compare-label" style="color: var(--blue);">Glob = What files EXIST?</div>
+      <pre><span class="cmt">"Find all test files"</span>
+glob(<span class="str">"**/*.test.tsx"</span>)</pre>
+    </div>
+  </div>
+
+  <h3>Edit vs Read+Write Fallback</h3>
+  <p>Edit works by matching <strong>unique text</strong>. If the target text appears multiple times, Edit fails. Fall back to Read+Write:</p>
+  <pre><span class="cmt"># Edit works — "MAX_RETRIES = 3" is unique</span>
+Edit(file=<span class="str">"config.py"</span>, old=<span class="str">"MAX_RETRIES = 3"</span>, new=<span class="str">"MAX_RETRIES = 5"</span>)
+
+<span class="cmt"># Edit fails — "return None" appears 6 times</span>
+<span class="cmt"># Fallback: Read → modify programmatically → Write</span>
+content = Read(<span class="str">"handlers.py"</span>)
+updated = content.replace(<span class="str">"return None  # fallback"</span>, <span class="str">"return default"</span>, <span class="val">1</span>)
+Write(<span class="str">"handlers.py"</span>, updated)</pre>
+
+  <h3>Incremental Codebase Understanding</h3>
+  <div class="flow">
+    <span class="flow-node">Grep entry point</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Read that file</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Follow imports</span>
+    <span class="flow-arrow">→</span>
+    <span class="flow-node">Read next file</span>
+  </div>
+  <p style="margin-top: 12px;">Start narrow, expand as needed. Never read every file upfront — most will be irrelevant and waste your context window.</p>
+
+  <h3>Quick Reference</h3>
+  <table class="ref-table">
+    <tr><th>I need to…</th><th>Use</th></tr>
+    <tr><td>Find files containing "TODO"</td><td>Grep</td></tr>
+    <tr><td>Find all .yaml config files</td><td>Glob</td></tr>
+    <tr><td>Understand what a file does</td><td>Read</td></tr>
+    <tr><td>Create a new file</td><td>Write</td></tr>
+    <tr><td>Change one line in a big file</td><td>Edit</td></tr>
+    <tr><td>Edit fails (non-unique match)</td><td>Read + Write</td></tr>
+    <tr><td>Run tests or install packages</td><td>Bash</td></tr>
+    <tr><td>Map function usage</td><td>Grep → Read → Grep</td></tr>
+  </table>
+</div>
+
+</div>
+
+<!-- ═══════════════ FOOTER ═══════════════ -->
+<div class="footer">
+  Domain 2: Tool Design & MCP Integration · Claude Agent SDK Certification Study Guide
+</div>
+
+</body>
+</html>

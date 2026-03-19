@@ -1,0 +1,940 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain 1 — Agentic Architecture & Orchestration</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-raised: #1c2333;
+    --border: #30363d;
+    --border-accent: #f78166;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent: #f78166;
+    --accent-glow: rgba(247, 129, 102, 0.15);
+    --blue: #79c0ff;
+    --green: #7ee787;
+    --purple: #d2a8ff;
+    --yellow: #e3b341;
+    --cyan: #a5d6ff;
+    --red: #ff7b72;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'Source Sans 3', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 5rem 0 3rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 120px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    max-width: 600px;
+  }
+
+  /* ── NAV PILLS ── */
+  .nav-section {
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .nav-pills {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-pills a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-pills a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  /* ── CHUNKS ── */
+  .chunk {
+    padding: 3.5rem 0;
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.6s ease-out both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chunk-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .chunk-number {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--bg);
+    background: var(--accent);
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .chunk h2 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .chunk h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--blue);
+    margin: 2rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .chunk h3::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  .chunk p {
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .chunk p strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── CONCEPT CARDS ── */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.25rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .concept-card.rule::before { background: var(--accent); }
+  .concept-card.pattern::before { background: var(--blue); }
+  .concept-card.warning::before { background: var(--yellow); }
+  .concept-card.tip::before { background: var(--green); }
+
+  .concept-card .card-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
+
+  .concept-card.rule .card-label { color: var(--accent); }
+  .concept-card.pattern .card-label { color: var(--blue); }
+  .concept-card.warning .card-label { color: var(--yellow); }
+  .concept-card.tip .card-label { color: var(--green); }
+
+  .concept-card p {
+    color: var(--text);
+    font-weight: 400;
+    margin-bottom: 0;
+  }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  pre .lang-tag {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .kw { color: var(--purple); }
+  .fn { color: var(--blue); }
+  .str { color: var(--green); }
+  .cmt { color: var(--text-dim); font-style: italic; }
+  .val { color: var(--accent); }
+  .op { color: var(--text-muted); }
+
+  code.inline {
+    background: var(--surface-raised);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--cyan);
+  }
+
+  /* ── ANTI-PATTERN / DO-THIS ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+
+  .compare-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .compare-item.bad {
+    border-color: rgba(255, 123, 114, 0.3);
+  }
+
+  .compare-item.good {
+    border-color: rgba(126, 231, 135, 0.3);
+  }
+
+  .compare-item .label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .compare-item.bad .label { color: var(--red); }
+  .compare-item.good .label { color: var(--green); }
+
+  .compare-item p {
+    font-size: 0.92rem;
+    margin-bottom: 0;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* ── DIAGRAM ── */
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--cyan);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ── DECISION TABLE ── */
+  .decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+  }
+
+  .decision-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    border-bottom: 2px solid var(--border);
+    background: var(--surface);
+  }
+
+  .decision-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .decision-table td:first-child {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .yes { color: var(--green); font-weight: 600; }
+  .no { color: var(--red); font-weight: 600; }
+
+  /* ── KEY TAKEAWAY ── */
+  .takeaway {
+    background: linear-gradient(135deg, var(--accent-glow), transparent 60%);
+    border: 1px solid rgba(247, 129, 102, 0.25);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 2rem 0 0;
+  }
+
+  .takeaway .takeaway-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .takeaway p {
+    color: var(--text);
+    font-weight: 400;
+    margin-bottom: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Claude Agent SDK Certification — Study Guide</div>
+    <h1>Agentic Architecture<br>& <em>Orchestration</em></h1>
+    <p class="hero-sub">Domain 1 — seven core concepts from agentic loops to session forking, distilled for exam readiness.</p>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav-section">
+    <div class="nav-pills">
+      <a href="#chunk1">01 Agentic Loop</a>
+      <a href="#chunk2">02 Multi-Agent</a>
+      <a href="#chunk3">03 Subagent Mechanics</a>
+      <a href="#chunk4">04 Enforcement</a>
+      <a href="#chunk5">05 SDK Hooks</a>
+      <a href="#chunk6">06 Decomposition</a>
+      <a href="#chunk7">07 Sessions</a>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 1 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk1">
+    <div class="chunk-header">
+      <span class="chunk-number">01</span>
+      <h2>The Agentic Loop</h2>
+    </div>
+
+    <p>The agentic loop is a <code class="inline">while</code> loop where <strong>Claude decides when to stop</strong> — not your code. You send a message, Claude responds, and you check <code class="inline">stop_reason</code> to decide what happens next.</p>
+
+    <div class="concept-card rule">
+      <div class="card-label">Core Rule</div>
+      <p>If <code class="inline">stop_reason == "tool_use"</code> → execute the tool, append the result, loop again. If <code class="inline">stop_reason == "end_turn"</code> → Claude is done, exit.</p>
+    </div>
+
+    <h3>Loop Pseudocode</h3>
+    <pre><span class="lang-tag">python</span><code>messages = [{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: user_query}]
+
+<span class="kw">while</span> <span class="val">True</span>:
+    response = client.messages.<span class="fn">create</span>(
+        model=<span class="str">"claude-sonnet-4-5-20250514"</span>,
+        tools=my_tools,
+        messages=messages
+    )
+    <span class="cmt"># Append Claude's response to conversation history</span>
+    messages.<span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"assistant"</span>, <span class="str">"content"</span>: response.content})
+
+    <span class="kw">if</span> response.stop_reason == <span class="str">"end_turn"</span>:
+        <span class="kw">break</span>
+
+    <span class="cmt"># Execute tools, append results as a user message</span>
+    tool_results = <span class="fn">execute_tools</span>(response.content)
+    messages.<span class="fn">append</span>({<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: tool_results})</code></pre>
+
+    <p>Tool results are appended as a <strong>user message</strong>. This is how Claude "sees" what happened — it's all conversation history.</p>
+
+    <h3>Three Anti-Patterns to Avoid</h3>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✕ Don't do this</div>
+        <p>Parsing Claude's text for "I'm done" to decide loop termination. Use <code class="inline">stop_reason</code>, not natural language signals.</p>
+      </div>
+      <div class="compare-item bad">
+        <div class="label">✕ Don't do this</div>
+        <p>Hardcoding iteration caps as the <strong>primary</strong> stop mechanism. A safety cap is fine, but shouldn't be the design.</p>
+      </div>
+    </div>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✕ Don't do this</div>
+        <p>Checking for assistant text content as a completion indicator. Claude can emit text <strong>and</strong> tool calls in the same response.</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">✓ Do this</div>
+        <p>Always use <code class="inline">stop_reason</code> as the single source of truth for loop control. Model-driven termination is the correct pattern.</p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>Claude is the reasoning engine. Your code is the executor. The loop continues until Claude says it's done via <code class="inline">stop_reason</code>.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 2 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk2">
+    <div class="chunk-header">
+      <span class="chunk-number">02</span>
+      <h2>Multi-Agent Orchestration</h2>
+    </div>
+
+    <p>Instead of one agent doing everything, a <strong>coordinator</strong> delegates to <strong>subagents</strong> in a hub-and-spoke pattern. The coordinator is the project manager — it never does the actual work itself.</p>
+
+    <h3>Coordinator Responsibilities</h3>
+    <div class="concept-card pattern">
+      <div class="card-label">Pattern</div>
+      <p><strong>Analyze</strong> the request → <strong>Decompose</strong> into subtasks → <strong>Delegate</strong> to subagents → <strong>Aggregate</strong> results → <strong>Evaluate</strong> completeness → loop if gaps remain.</p>
+    </div>
+
+    <h3>Hub-and-Spoke Architecture</h3>
+    <div class="diagram">       User Query
+           │
+           ▼
+     ┌────────────┐
+     │ Coordinator │ ◄── Evaluates completeness
+     └────────────┘
+      │    │    │
+      ▼    ▼    ▼
+     S1   S2   S3    ◄── Subagents (isolated context)
+      │    │    │
+      └────┴────┘
+           │
+           ▼
+    Aggregated Result</div>
+
+    <div class="concept-card rule">
+      <div class="card-label">Critical Rule</div>
+      <p>Subagents have <strong>isolated context</strong>. They do NOT inherit the coordinator's conversation, other subagents' findings, or the user's original query. You must pass everything explicitly.</p>
+    </div>
+
+    <h3>Smart vs. Dumb Coordination</h3>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✕ Pipeline (dumb)</div>
+        <p>Every query runs through ALL subagents in sequence regardless of complexity. "What are your hours?" hits search → analysis → synthesis.</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">✓ Dynamic routing (smart)</div>
+        <p>Coordinator analyzes query, picks only the subagents needed. Simple lookups skip analysis. Complex queries use the full pipeline.</p>
+      </div>
+    </div>
+
+    <h3>The Gap-Checking Loop</h3>
+    <p>After synthesis, the coordinator asks: <strong>"Is this complete?"</strong> If not, it re-delegates with targeted queries and re-invokes synthesis. This iterative refinement is what separates a good system from a basic one.</p>
+
+    <div class="concept-card warning">
+      <div class="card-label">Watch Out</div>
+      <p><strong>Over-decomposition trap:</strong> Slicing a topic too narrowly means each subagent covers a tiny slice well but misses the connections between them. Decompose at the right granularity.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>The coordinator is the brain. Subagents are the hands. All communication flows through the coordinator — giving you observability, error handling, and control.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 3 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk3">
+    <div class="chunk-header">
+      <span class="chunk-number">03</span>
+      <h2>Subagent Mechanics</h2>
+    </div>
+
+    <p>The hands-on mechanics of spawning subagents, passing context, and configuring agent definitions.</p>
+
+    <h3>The Task Tool</h3>
+    <div class="concept-card rule">
+      <div class="card-label">Rule</div>
+      <p>Subagents are spawned via the <strong>Task tool</strong>. The coordinator's <code class="inline">allowedTools</code> must include <code class="inline">"Task"</code> — otherwise it cannot spawn subagents. Each Task call creates a fresh agent with its own context window.</p>
+    </div>
+
+    <h3>AgentDefinition</h3>
+    <pre><span class="lang-tag">python</span><code>{
+    <span class="str">"description"</span>: <span class="str">"Searches the web for current information"</span>,
+    <span class="str">"system_prompt"</span>: <span class="str">"You are a focused research agent..."</span>,
+    <span class="str">"allowed_tools"</span>: [<span class="str">"web_search"</span>, <span class="str">"web_fetch"</span>]
+}</code></pre>
+    <p>Each subagent gets constrained tools. The <code class="inline">description</code> field is how the coordinator decides <strong>which</strong> subagent to invoke — it's decision logic, not documentation.</p>
+
+    <h3>Explicit Context Passing</h3>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✕ Broken — assumes inheritance</div>
+        <p><code class="inline">Task("search_agent", "Find more about the topic")</code> — the subagent has no idea what "the topic" is.</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">✓ Working — explicit context</div>
+        <p><code class="inline">Task("search_agent", "Find recent research on lithium-ion battery recycling. Prior analysis found: [hydro, pyro]. Focus on newer methods.")</code></p>
+      </div>
+    </div>
+
+    <h3>Structured Data for Attribution</h3>
+    <pre><span class="lang-tag">json</span><code>{
+  <span class="str">"findings"</span>: [{
+    <span class="str">"content"</span>: <span class="str">"Recycling rates improved 30%"</span>,
+    <span class="str">"source_url"</span>: <span class="str">"https://example.com/study"</span>,
+    <span class="str">"document"</span>: <span class="str">"2024 Battery Report"</span>,
+    <span class="str">"page"</span>: <span class="val">14</span>
+  }],
+  <span class="str">"gaps_identified"</span>: [<span class="str">"Cost comparison data missing"</span>]
+}</code></pre>
+    <p>Separate <strong>content</strong> from <strong>metadata</strong> so downstream agents can write summaries <em>and</em> provide attribution.</p>
+
+    <h3>Parallel Spawning</h3>
+    <div class="concept-card tip">
+      <div class="card-label">Power Move</div>
+      <p>Emit <strong>multiple Task calls in a single coordinator response</strong> to run subagents concurrently. Massively faster than sequential delegation when subtasks are independent.</p>
+    </div>
+
+    <h3>Coordinator Prompt Philosophy</h3>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✕ Procedural</div>
+        <p>"Step 1: Call search agent. Step 2: Call analysis. Step 3: Call synthesis."</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">✓ Goal-oriented</div>
+        <p>"Produce a research report with 5+ credible sources covering X, Y, Z. Delegate to specialists as needed. Verify coverage before delivering."</p>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>Context doesn't flow automatically — you pump it explicitly. Use structured formats to preserve attribution. Spawn in parallel when independent. Design coordinator prompts around outcomes, not procedures.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 4 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk4">
+    <div class="chunk-header">
+      <span class="chunk-number">04</span>
+      <h2>Workflow Enforcement & Handoffs</h2>
+    </div>
+
+    <p>Where theory meets production. Real workflows have <strong>rules that cannot be broken</strong> and sometimes require <strong>escalation to humans</strong>.</p>
+
+    <h3>Prompts vs. Programmatic Enforcement</h3>
+    <div class="concept-card rule">
+      <div class="card-label">Foundational Principle</div>
+      <p><strong>Prompts are suggestions; hooks are guarantees.</strong> If you'd get fired for the 1% failure, use a hook. If it's a preference, a prompt is fine.</p>
+    </div>
+
+    <h3>Prerequisite Gates</h3>
+    <pre><span class="lang-tag">python</span><code><span class="kw">def</span> <span class="fn">pre_tool_hook</span>(tool_name, tool_input):
+    <span class="kw">if</span> tool_name == <span class="str">"process_refund"</span>:
+        <span class="kw">if not</span> workflow_state[<span class="str">"customer_verified"</span>]:
+            <span class="kw">return</span> <span class="fn">BLOCK</span>(<span class="str">"Cannot process refund: customer not verified"</span>)
+        <span class="kw">if not</span> workflow_state[<span class="str">"order_retrieved"</span>]:
+            <span class="kw">return</span> <span class="fn">BLOCK</span>(<span class="str">"Cannot process refund: order not retrieved"</span>)
+    <span class="kw">return</span> <span class="fn">ALLOW</span></code></pre>
+    <p>Claude doesn't even know this gating exists. It tries to call the tool, gets blocked with an explanation, and naturally adjusts within the agentic loop.</p>
+
+    <h3>Multi-Concern Decomposition</h3>
+    <p>Customer says: <em>"Wrong item, promo code didn't work, and update my address."</em> — that's three issues. A good agent decomposes them, <strong>investigates all three in parallel</strong> using shared context, then synthesizes one unified response.</p>
+
+    <h3>Structured Handoff Summaries</h3>
+    <pre><span class="lang-tag">json</span><code>{
+  <span class="str">"customer_id"</span>: <span class="str">"CUST-4521"</span>,
+  <span class="str">"issue_summary"</span>: <span class="str">"Defective product, requests full refund"</span>,
+  <span class="str">"root_cause"</span>: <span class="str">"Shipped from damaged batch #B-229"</span>,
+  <span class="str">"recommended_action"</span>: <span class="str">"Full refund $189.99 + 15% credit"</span>,
+  <span class="str">"reason_for_escalation"</span>: <span class="str">"Exceeds $100 agent authority"</span>
+}</code></pre>
+
+    <div class="concept-card tip">
+      <div class="card-label">Key Insight</div>
+      <p>Escalation isn't failure — it's a designed part of the system. The agent's job is to <strong>minimize the work the human has to do</strong> by handing off a complete picture.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>Programmatic gates for rules that can't fail. Parallel investigation for multi-concern requests. Structured summaries for human handoffs.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 5 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk5">
+    <div class="chunk-header">
+      <span class="chunk-number">05</span>
+      <h2>SDK Hooks Deep Dive</h2>
+    </div>
+
+    <p>Hooks sit between Claude and the outside world, intercepting in <strong>two directions</strong>.</p>
+
+    <div class="diagram">                 ┌──────────┐
+Claude ──call──► │ PRE-HOOK │ ──► Tool Execution
+                 └──────────┘
+                 ┌───────────┐
+Claude ◄──result─│ POST-HOOK │ ◄── Tool Execution
+                 └───────────┘</div>
+
+    <h3>Post-Hooks: Data Normalization</h3>
+    <p>Different backends return dates as Unix epochs, ISO 8601, or human strings. Claude <em>usually</em> handles this, but sometimes makes comparison errors. A PostToolUse hook fixes this <strong>deterministically</strong>.</p>
+
+    <pre><span class="lang-tag">python</span><code><span class="kw">def</span> <span class="fn">post_tool_normalize</span>(tool_name, tool_result):
+    normalized = tool_result.<span class="fn">copy</span>()
+    <span class="cmt"># Normalize all dates to ISO 8601</span>
+    <span class="kw">for</span> key <span class="kw">in</span> [<span class="str">"created_at"</span>, <span class="str">"ship_date"</span>, <span class="str">"due_date"</span>]:
+        <span class="kw">if</span> key <span class="kw">in</span> normalized:
+            normalized[key] = <span class="fn">to_iso8601</span>(normalized[key])
+    <span class="cmt"># Normalize status codes to readable strings</span>
+    <span class="kw">if</span> <span class="str">"status"</span> <span class="kw">in</span> normalized <span class="kw">and</span> <span class="fn">isinstance</span>(normalized[<span class="str">"status"</span>], <span class="val">int</span>):
+        normalized[<span class="str">"status"</span>] = status_map.<span class="fn">get</span>(normalized[<span class="str">"status"</span>])
+    <span class="kw">return</span> normalized</code></pre>
+
+    <div class="concept-card pattern">
+      <div class="card-label">Design Principle</div>
+      <p>Claude should reason about your <strong>domain</strong>, not about data format inconsistencies. Normalize field names, null handling, error formats, and date representations before Claude ever sees them.</p>
+    </div>
+
+    <h3>Pre-Hooks: Policy Enforcement</h3>
+    <pre><span class="lang-tag">python</span><code><span class="kw">def</span> <span class="fn">pre_tool_policy_check</span>(tool_name, tool_input):
+    <span class="kw">if</span> tool_name == <span class="str">"process_refund"</span>:
+        amount = <span class="fn">float</span>(tool_input.<span class="fn">get</span>(<span class="str">"amount"</span>, <span class="val">0</span>))
+        <span class="kw">if</span> amount > <span class="val">500.00</span>:
+            <span class="kw">return</span> {
+                <span class="str">"action"</span>: <span class="str">"BLOCK"</span>,
+                <span class="str">"message"</span>: <span class="str">"Exceeds $500 limit. Escalate to human."</span>
+            }
+    <span class="kw">return</span> {<span class="str">"action"</span>: <span class="str">"ALLOW"</span>}</code></pre>
+
+    <p>The block message is <strong>instructive</strong> — it tells Claude what to do instead. Claude receives this as the tool result and naturally adjusts.</p>
+
+    <h3>Hook vs. Prompt Decision Framework</h3>
+    <table class="decision-table">
+      <thead>
+        <tr><th>Requirement</th><th>Hook</th><th>Prompt</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Refund limits</td><td class="yes">✓</td><td class="no">✗</td></tr>
+        <tr><td>Data format consistency</td><td class="yes">✓</td><td class="no">✗</td></tr>
+        <tr><td>Tone of voice</td><td class="no">✗</td><td class="yes">✓</td></tr>
+        <tr><td>PII redaction before logging</td><td class="yes">✓</td><td class="no">✗</td></tr>
+        <tr><td>Suggested upsells</td><td class="no">✗</td><td class="yes">✓</td></tr>
+        <tr><td>Blocking admin tools</td><td class="yes">✓</td><td class="no">✗</td></tr>
+        <tr><td>Preferred resolution order</td><td class="no">✗</td><td class="yes">✓</td></tr>
+      </tbody>
+    </table>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>Post-hooks clean incoming data so Claude reasons clearly. Pre-hooks enforce rules so Claude can't break policy. Together they separate <em>what Claude thinks about</em> from <em>what it's allowed to do</em>.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 6 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk6">
+    <div class="chunk-header">
+      <span class="chunk-number">06</span>
+      <h2>Task Decomposition Strategies</h2>
+    </div>
+
+    <p>How to break big problems into small ones — and knowing <strong>which pattern fits which situation</strong>.</p>
+
+    <h3>Pattern A: Prompt Chaining (Fixed Pipeline)</h3>
+    <p>Steps are known in advance. Each feeds into the next. Best for <strong>predictable</strong> workflows like code review, report generation, multi-language translation.</p>
+
+    <div class="diagram"> Input ──► Step 1 ──► Step 2 ──► Step 3 ──► Output</div>
+
+    <div class="concept-card pattern">
+      <div class="card-label">Code Review Pattern</div>
+      <p><strong>Pass 1 (per-file):</strong> Each file gets focused individual analysis — full attention, no dilution. <strong>Pass 2 (cross-file):</strong> Integration pass to catch systemic patterns spanning multiple files. You'd miss things doing either pass alone.</p>
+    </div>
+
+    <h3>Pattern B: Dynamic Adaptive Decomposition</h3>
+    <p>Steps emerge as you go. What you discover in step 1 determines what step 2 even is. Best for <strong>investigative</strong> tasks like debugging, legacy test coverage, open-ended research.</p>
+
+    <div class="diagram"> Input ──► Discover ──► Plan ──► Execute ──► Adapt ──► ...
+                  ▲                                  │
+                  └──────── new subtasks emerge ─────┘</div>
+
+    <h3>Decision Framework</h3>
+    <table class="decision-table">
+      <thead>
+        <tr><th>Question</th><th>Yes →</th><th>No →</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Do I know all steps before starting?</td><td>Prompt chaining</td><td>Dynamic</td></tr>
+        <tr><td>Does step N change what step N+1 is?</td><td>Dynamic</td><td>Prompt chaining</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Real-World Mappings</h3>
+    <table class="decision-table">
+      <thead>
+        <tr><th>Task</th><th>Pattern</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Summarize a doc in 3 languages</td><td>Prompt chaining</td></tr>
+        <tr><td>Debug why the app is slow</td><td>Dynamic decomposition</td></tr>
+        <tr><td>Review a PR against style guidelines</td><td>Prompt chaining</td></tr>
+        <tr><td>Migrate REST to GraphQL</td><td>Dynamic decomposition</td></tr>
+        <tr><td>Monthly report from 5 data sources</td><td>Prompt chaining</td></tr>
+        <tr><td>Figure out why customers churn</td><td>Dynamic decomposition</td></tr>
+      </tbody>
+    </table>
+
+    <div class="concept-card tip">
+      <div class="card-label">Hybrid Reality</div>
+      <p>In practice, many workflows use a <strong>fixed outer pipeline</strong> where individual steps use <strong>dynamic decomposition internally</strong>. The coordinator runs the pipeline; subagents adapt within each step.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>Prompt chaining when predictable. Dynamic decomposition when investigative. Split big reviews into per-unit passes + cross-unit integration. Give agents permission to adapt via goal-oriented prompts.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- CHUNK 7 -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="chunk" id="chunk7">
+    <div class="chunk-header">
+      <span class="chunk-number">07</span>
+      <h2>Session State & Forking</h2>
+    </div>
+
+    <p>How agents maintain <strong>continuity across time</strong> and explore <strong>branching paths</strong>.</p>
+
+    <h3>Named Session Resumption</h3>
+    <pre><span class="lang-tag">bash</span><code><span class="cmt"># Start a named session</span>
+claude --session <span class="str">"auth-refactor"</span> <span class="str">"Analyze the auth module for security issues"</span>
+
+<span class="cmt"># Resume later</span>
+claude --resume <span class="str">"auth-refactor"</span> <span class="str">"Now suggest fixes for the top 3 issues"</span></code></pre>
+
+    <h3>When Resumption Breaks</h3>
+    <div class="concept-card warning">
+      <div class="card-label">The Stale Context Trap</div>
+      <p>If you edited files between sessions, the agent's context contains <strong>old tool results</strong>. It doesn't know things changed. Either tell it exactly what changed (small edits) or start fresh with an injected summary (extensive changes).</p>
+    </div>
+
+    <div class="compare-grid">
+      <div class="compare-item good">
+        <div class="label">Option A: Inform the agent</div>
+        <p>"I updated auth.py lines 45-60 and fixed the token bug in middleware.py. Re-analyze these two files." — good for <strong>small, targeted changes</strong>.</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">Option B: Fresh + injected summary</div>
+        <p>Start a new session seeded with distilled findings, status, and a list of changes. More reliable when <strong>files have changed extensively</strong>.</p>
+      </div>
+    </div>
+
+    <h3>Fork-Based Session Management</h3>
+    <div class="diagram"> Shared baseline analysis
+     │
+     ├── Fork A: "Fix using JWT with refresh rotation"
+     │
+     └── Fork B: "Fix using session-based auth with Redis"
+
+ Both forks see the full analysis. Neither contaminates the other.</div>
+
+    <h3>Where Forking Shines</h3>
+    <div class="concept-card tip">
+      <div class="card-label">Use Cases</div>
+      <p>Comparing two testing strategies. Trying two refactoring approaches before committing. Exploring optimistic vs. conservative solutions. A/B testing prompt strategies for a subagent.</p>
+    </div>
+
+    <h3>Decision Framework</h3>
+    <table class="decision-table">
+      <thead>
+        <tr><th>Situation</th><th>Strategy</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Files mostly unchanged</td><td>Resume the session</td></tr>
+        <tr><td>Files heavily modified</td><td>Fresh session + injected summary</td></tr>
+        <tr><td>Want to explore 2+ approaches</td><td>Fork from shared baseline</td></tr>
+      </tbody>
+    </table>
+
+    <div class="diagram"> Linear:     S1 ──► S2 ──► S3              (resume)
+
+ Branching:  S1 ──► S2 ──┬── S3a           (fork)
+                          └── S3b
+
+ Restart:    S1 ──► S2    S3(summary)       (fresh + inject)
+                    ✕     ▲
+                  stale   condensed knowledge</div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Key Takeaway</div>
+      <p>Resume when context is fresh. Fork when exploring alternatives. Start fresh with injected summaries when the world has changed. The judgment call is always about <strong>context freshness</strong>.</p>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    Domain 1 of 5 · Claude Agent SDK Certification · Study Guide
+  </footer>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domain 5 — Context Management & Reliability</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=JetBrains+Mono:wght@400;600&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface-raised: #1c2333;
+    --border: #30363d;
+    --border-accent: #f78166;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --text-dim: #6e7681;
+    --accent: #f78166;
+    --accent-glow: rgba(247, 129, 102, 0.15);
+    --blue: #79c0ff;
+    --green: #7ee787;
+    --purple: #d2a8ff;
+    --yellow: #e3b341;
+    --cyan: #a5d6ff;
+    --red: #ff7b72;
+    --serif: 'DM Serif Display', Georgia, serif;
+    --sans: 'Source Sans 3', -apple-system, sans-serif;
+    --mono: 'JetBrains Mono', 'Fira Code', monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  .container {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    padding: 5rem 0 3rem;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 120px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .hero-label {
+    font-family: var(--mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-label::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .hero h1 {
+    font-family: var(--serif);
+    font-size: 3rem;
+    font-weight: 400;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 1rem;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-sub {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    max-width: 600px;
+  }
+
+  /* ── NAV PILLS ── */
+  .nav-section {
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+
+  .nav-pills {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  .nav-pills a {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-pills a:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  /* ── CHUNKS ── */
+  .chunk {
+    padding: 3.5rem 0;
+    border-bottom: 1px solid var(--border);
+    animation: fadeUp 0.6s ease-out both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chunk-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .chunk-number {
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--bg);
+    background: var(--accent);
+    padding: 0.25rem 0.55rem;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .chunk h2 {
+    font-family: var(--serif);
+    font-size: 1.8rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .chunk h3 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--blue);
+    margin: 2rem 0 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .chunk h3::before {
+    content: '▸';
+    color: var(--accent);
+    font-size: 0.85rem;
+  }
+
+  .chunk p {
+    margin-bottom: 1rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .chunk p strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  /* ── CONCEPT CARDS ── */
+  .concept-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.25rem 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .concept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px;
+    height: 100%;
+  }
+
+  .concept-card.rule::before { background: var(--accent); }
+  .concept-card.pattern::before { background: var(--blue); }
+  .concept-card.warning::before { background: var(--yellow); }
+  .concept-card.tip::before { background: var(--green); }
+
+  .concept-card .card-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.5rem;
+  }
+
+  .concept-card.rule .card-label { color: var(--accent); }
+  .concept-card.pattern .card-label { color: var(--blue); }
+  .concept-card.warning .card-label { color: var(--yellow); }
+  .concept-card.tip .card-label { color: var(--green); }
+
+  .concept-card p {
+    color: var(--text);
+    font-weight: 400;
+    margin-bottom: 0;
+  }
+
+  /* ── CODE BLOCKS ── */
+  pre {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    position: relative;
+  }
+
+  pre .lang-tag {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-family: var(--mono);
+    font-size: 0.6rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  code {
+    font-family: var(--mono);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .kw { color: var(--purple); }
+  .fn { color: var(--blue); }
+  .str { color: var(--green); }
+  .cmt { color: var(--text-dim); font-style: italic; }
+  .val { color: var(--accent); }
+  .op { color: var(--text-muted); }
+
+  code.inline {
+    background: var(--surface-raised);
+    padding: 0.15rem 0.45rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    color: var(--cyan);
+  }
+
+  /* ── ANTI-PATTERN / DO-THIS ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+
+  @media (max-width: 640px) {
+    .compare-grid { grid-template-columns: 1fr; }
+  }
+
+  .compare-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+
+  .compare-item.bad {
+    border-color: rgba(255, 123, 114, 0.3);
+  }
+
+  .compare-item.good {
+    border-color: rgba(126, 231, 135, 0.3);
+  }
+
+  .compare-item .label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .compare-item.bad .label { color: var(--red); }
+  .compare-item.good .label { color: var(--green); }
+
+  .compare-item p {
+    font-size: 0.92rem;
+    margin-bottom: 0;
+    color: var(--text);
+    font-weight: 400;
+  }
+
+  /* ── DIAGRAM ── */
+  .diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.75rem;
+    margin: 1.5rem 0;
+    font-family: var(--mono);
+    font-size: 0.8rem;
+    line-height: 1.6;
+    color: var(--cyan);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  /* ── DECISION TABLE ── */
+  .decision-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.25rem 0;
+    font-size: 0.9rem;
+  }
+
+  .decision-table th {
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    border-bottom: 2px solid var(--border);
+    background: var(--surface);
+  }
+
+  .decision-table td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .decision-table td:first-child {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .yes { color: var(--green); font-weight: 600; }
+  .no { color: var(--red); font-weight: 600; }
+
+  /* ── KEY TAKEAWAY ── */
+  .takeaway {
+    background: linear-gradient(135deg, var(--accent-glow), transparent 60%);
+    border: 1px solid rgba(247, 129, 102, 0.25);
+    border-radius: 10px;
+    padding: 1.25rem 1.5rem;
+    margin: 2rem 0 0;
+  }
+
+  .takeaway .takeaway-label {
+    font-family: var(--mono);
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+
+  .takeaway p {
+    color: var(--text);
+    font-weight: 400;
+    margin-bottom: 0;
+  }
+
+  /* ── FOOTER ── */
+  footer {
+    padding: 3rem 0;
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-dim); }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-label">Claude Agent SDK Certification — Study Guide</div>
+    <h1>Context Management<br>& <em>Reliability</em></h1>
+    <p class="hero-sub">Domain 5 — six task statements covering context degradation, escalation logic, error propagation, codebase exploration, human review, and information provenance.</p>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav-section">
+    <div class="nav-pills">
+      <a href="#chunk1">5.1 Context Threats</a>
+      <a href="#chunk2">5.1 Countermeasures</a>
+      <a href="#chunk3">5.2 Escalation</a>
+      <a href="#chunk4">5.3 Error Propagation</a>
+      <a href="#chunk5">5.4 Codebase Exploration</a>
+      <a href="#chunk6">5.5 Human Review</a>
+      <a href="#chunk7">5.6 Provenance</a>
+    </div>
+  </nav>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 1 — The Three Context Threats      -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk1" style="animation-delay: 0.1s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.1a</span>
+      <h2>The Three Context Threats</h2>
+    </div>
+
+    <p>Context is a finite, degrading resource. Every long interaction is a fight against three forces that erode the information your agent needs to do its job.</p>
+
+    <h3>Progressive Summarization Risk</h3>
+    <p>When context grows long, the system summarizes earlier turns. Concrete transactional facts — dollar amounts, dates, order numbers — get smoothed into vague descriptions. The exact data the agent needs to resolve an issue disappears.</p>
+
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✗ What the summary retains</div>
+        <p>"Customer disputes a pricing discrepancy on a recent order."</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">✓ What was actually said</div>
+        <p>"Charged $47.99 on March 3rd for order #8812 — website showed $39.99."</p>
+      </div>
+    </div>
+
+    <h3>The "Lost in the Middle" Effect</h3>
+    <p>Models process information at the <strong>beginning</strong> and <strong>end</strong> of long inputs most reliably. Information buried in the middle of a large context window is more likely to be overlooked. If the customer's key complaint was stated in turn 14 of a 30-turn conversation, it's in the danger zone.</p>
+
+    <div class="concept-card warning">
+      <div class="card-label">Position Effect</div>
+      <p>Beginning of context = high reliability. End of context = high reliability. Middle of context = degraded attention. Place critical data at the top or bottom, never buried in the middle.</p>
+    </div>
+
+    <h3>Tool Result Bloat</h3>
+    <p>An <code class="inline">lookup_order</code> call returns 40+ fields — shipping carrier tracking events, warehouse codes, internal SKU data, tax breakdowns. The agent only needed 5 fields. Those 40 fields now sit in context, consuming tokens and diluting signal.</p>
+    <p>Across a multi-turn session with several lookups, this compounds: <strong>200 irrelevant fields</strong> vs. 25 relevant ones.</p>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Core Principle</div>
+      <p>Context isn't just "the conversation so far." It's an engineered input that you actively curate — deciding what enters, what format it takes, and where it's positioned.</p>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 2 — Fighting Context Degradation   -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk2" style="animation-delay: 0.15s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.1b</span>
+      <h2>Fighting Context Degradation</h2>
+    </div>
+
+    <p>Four techniques to counter the three threats. Each targets a specific failure mode.</p>
+
+    <h3>Technique 1: The "Case Facts" Block</h3>
+    <p>Extract critical transactional data into a <strong>separate structured block</strong> included in every prompt, outside of summarized history. The conversation can be condensed — the case facts block always stays intact.</p>
+
+    <pre><span class="lang-tag">case facts</span><code><span class="cmt">=== CASE FACTS ===</span>
+<span class="fn">Customer:</span> <span class="str">Jane Martinez, ID #4421</span>
+<span class="fn">Issue 1:</span> <span class="str">Order #8812 — charged $47.99, expected $39.99, placed March 3</span>
+<span class="fn">Issue 2:</span> <span class="str">Order #8840 — return requested, status: delivered March 7</span>
+<span class="fn">Escalation:</span> <span class="str">None requested</span>
+<span class="cmt">=== END CASE FACTS ===</span></code></pre>
+
+    <p>For multi-issue sessions, this becomes a <strong>structured context layer</strong> — a living document that grows as new issues surface.</p>
+
+    <div class="concept-card pattern">
+      <div class="card-label">Pattern — Persistent Context Layer</div>
+      <p>Structured issue data (order IDs, amounts, statuses) lives in a separate layer from conversation history. History can be summarized aggressively because the facts are protected externally.</p>
+    </div>
+
+    <h3>Technique 2: Trimming Tool Outputs</h3>
+    <p>Post-process tool results <strong>before</strong> they enter context. Keep only the fields relevant to the agent's current role. A 40-field order object becomes 5 fields of signal.</p>
+
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✗ Raw tool output</div>
+        <p>40 fields: warehouse routing codes, internal flags, tax line items, carrier tracking events, SKU metadata…</p>
+      </div>
+      <div class="compare-item good">
+        <div class="label">✓ Trimmed output</div>
+        <p>5 fields: order ID, item total, order date, status, return eligibility</p>
+      </div>
+    </div>
+
+    <h3>Technique 3: Strategic Positioning</h3>
+    <p>Counter the lost-in-the-middle effect with deliberate placement. Key findings summaries go at the <strong>beginning</strong> of aggregated inputs. Detailed results use <strong>explicit section headers</strong>. The case facts block sits at the <strong>top</strong> of the prompt.</p>
+
+    <h3>Technique 4: Structured Subagent Outputs</h3>
+    <p>Upstream subagents return <strong>structured data</strong> (key facts, citations, relevance scores) instead of verbose content and reasoning chains. Downstream agents with limited context budgets receive clean, compact inputs — not paragraphs of reasoning to parse.</p>
+
+    <div class="concept-card rule">
+      <div class="card-label">Exam Rule — Metadata Requirement</div>
+      <p>Subagents must include metadata in structured outputs: dates, source locations, and methodological context. This isn't optional — it supports accurate downstream synthesis (see Task 5.6).</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Throughline</div>
+      <p>Every technique here is about the same thing — being intentional about what enters context, what format it's in, and where it's positioned.</p>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 3 — Escalation & Ambiguity         -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk3" style="animation-delay: 0.2s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.2</span>
+      <h2>Escalation & Ambiguity Resolution</h2>
+    </div>
+
+    <p>Escalation isn't about difficulty — it's about authority boundaries. The curriculum defines three specific triggers.</p>
+
+    <h3>The Three Legitimate Triggers</h3>
+    <table class="decision-table">
+      <tr>
+        <th>Trigger</th>
+        <th>When It Fires</th>
+        <th>Key Nuance</th>
+      </tr>
+      <tr>
+        <td>Customer requests human</td>
+        <td>Explicit demand for a person</td>
+        <td>Non-negotiable hard rule — honor immediately</td>
+      </tr>
+      <tr>
+        <td>Policy exception / gap</td>
+        <td>Policy is silent or ambiguous on the request</td>
+        <td>Don't guess by analogy — silence = gap = escalate</td>
+      </tr>
+      <tr>
+        <td>No meaningful progress</td>
+        <td>Agent has tried and is genuinely stuck</td>
+        <td>Not "this is complex" — but "I cannot move forward"</td>
+      </tr>
+    </table>
+
+    <div class="concept-card warning">
+      <div class="card-label">What's NOT a Trigger</div>
+      <p><strong>Complexity alone.</strong> A case can be complex but fully within the agent's capability. Escalating because something has multiple steps wastes human capacity.</p>
+    </div>
+
+    <h3>The "Let Me Help" vs. "Right Away" Distinction</h3>
+    <p><strong>Soft request:</strong> Customer says "I want to talk to a manager." The issue is a simple return. You get <strong>one</strong> offer to resolve. If they reiterate, escalate immediately. No second attempts.</p>
+    <p><strong>Hard request:</strong> Customer says "Get me a human NOW." Escalate immediately. No investigation, no "let me just check." Emphatic demands are honored without delay.</p>
+
+    <div class="concept-card rule">
+      <div class="card-label">Hard Rule — Explicit Escalation</div>
+      <p>When a customer explicitly demands a human, this is a non-negotiable hard rule. Always honor it immediately. This is NOT conditional on the agent's assessment of the case.</p>
+    </div>
+
+    <h3>Unreliable Escalation Proxies</h3>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✗ Sentiment-based escalation</div>
+        <p>"If customer sounds angry, escalate." Angry customers may have simple issues. Calm customers may have impossible ones. Tone ≠ complexity.</p>
+      </div>
+      <div class="compare-item bad">
+        <div class="label">✗ Self-reported confidence scores</div>
+        <p>"If model confidence &lt; 0.7, escalate." Claude isn't well-calibrated at rating its own certainty. High confidence can coexist with wrong answers.</p>
+      </div>
+    </div>
+
+    <h3>The Policy Gap Pattern</h3>
+    <p>Your policy covers price matching against your <strong>own site's</strong> pricing errors. Customer asks for a competitor price match. The policy says nothing about competitors. The agent should not apply existing policy by analogy — <strong>silence in the policy is a gap, and gaps belong to humans.</strong></p>
+
+    <h3>Multiple Customer Matches</h3>
+    <p>Agent searches and finds two "Jane Martinez" accounts. The correct response is to <strong>ask for an additional identifier</strong> (zip code, email), not to pick one based on heuristics like "most recent order."</p>
+
+    <div class="concept-card pattern">
+      <div class="card-label">Pattern — Clarify, Don't Guess</div>
+      <p>When uncertain — whether about policy, customer identity, or case facts — ask for clarification rather than making a heuristic selection. This applies to ambiguous tool results, ambiguous customer requests, and ambiguous policy interpretation.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Throughline</div>
+      <p>Escalate when you lack the authority (policy gaps), the ability (no progress), or the permission (customer demands it). Everything else, resolve.</p>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 4 — Error Propagation              -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk4" style="animation-delay: 0.25s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.3</span>
+      <h2>Error Propagation in Multi-Agent Systems</h2>
+    </div>
+
+    <p>When a subagent fails, the coordinator needs enough context to make a smart decision — retry, fall back, proceed with partial results, or surface the gap to the user.</p>
+
+    <h3>The Two Anti-Patterns</h3>
+    <div class="compare-grid">
+      <div class="compare-item bad">
+        <div class="label">✗ Silent Suppression</div>
+        <p>Inventory subagent times out → returns empty result as if it succeeded → coordinator tells customer "item out of stock" → but the item <em>isn't</em> out of stock, the system just didn't respond. False information delivered.</p>
+      </div>
+      <div class="compare-item bad">
+        <div class="label">✗ Total Termination</div>
+        <p>Inventory subagent times out → entire workflow halts → order lookup and return check both succeeded but their results are discarded → customer gets "something went wrong." Useful work wasted.</p>
+      </div>
+    </div>
+
+    <h3>Access Failure vs. Valid Empty Result</h3>
+    <p>This is the foundational distinction. A subagent gets nothing back — but why?</p>
+
+    <table class="decision-table">
+      <tr>
+        <th>Type</th>
+        <th>What Happened</th>
+        <th>Coordinator Action</th>
+      </tr>
+      <tr>
+        <td>Access failure</td>
+        <td>Timeout, 500 error, connection dropped — query never completed</td>
+        <td>Retry, use fallback, inform customer of temp issue</td>
+      </tr>
+      <tr>
+        <td>Valid empty result</td>
+        <td>Query succeeded normally, no matching records exist</td>
+        <td>Confidently tell customer no record exists</td>
+      </tr>
+    </table>
+
+    <p>If the subagent returns <code class="inline">"no results"</code> for both cases, the coordinator can't distinguish them. Generic error statuses like <code class="inline">"service unavailable"</code> strip away decision-critical context.</p>
+
+    <h3>Structured Error Context</h3>
+    <pre><span class="lang-tag">json</span><code>{
+  <span class="fn">"status"</span>: <span class="str">"error"</span>,
+  <span class="fn">"failure_type"</span>: <span class="str">"timeout"</span>,
+  <span class="fn">"what_was_attempted"</span>: <span class="str">"inventory check for SKU #4419"</span>,
+  <span class="fn">"partial_results"</span>: <span class="val">null</span>,
+  <span class="fn">"retry_recommended"</span>: <span class="val">true</span>,
+  <span class="fn">"alternatives"</span>: <span class="str">"check warehouse B system directly"</span>
+}</code></pre>
+
+    <div class="concept-card pattern">
+      <div class="card-label">Pattern — Local Recovery Before Propagation</div>
+      <p>Subagents handle transient failures locally (retry once or twice). Only propagate errors they <strong>cannot</strong> resolve — including what was already attempted and any partial results. This prevents redundant coordinator retries.</p>
+    </div>
+
+    <h3>Coverage Annotations in Synthesis</h3>
+    <p>When the coordinator assembles a response and one subagent failed, the output flags the gap explicitly: <em>"Your order #8812 is eligible for return. Note: I wasn't able to check current inventory for a replacement — I can check again or connect you with a team member."</em></p>
+
+    <div class="concept-card tip">
+      <div class="card-label">Exam Tip — Preserve Partial Results</div>
+      <p>On failure, return structured error objects with partial results and coverage annotations — not silent failures. This is a recurring principle across the certification: always preserve work that already succeeded.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Throughline</div>
+      <p>Errors are data, not just failures. A well-designed system treats every error as a decision point for the coordinator — with enough structured context to decide intelligently.</p>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 5 — Codebase Exploration           -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk5" style="animation-delay: 0.3s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.4</span>
+      <h2>Context in Codebase Exploration</h2>
+    </div>
+
+    <p>Same degradation problems, different domain. Claude Code explores a massive codebase — thousands of files, complex dependency chains. The context window fills with verbose discovery output, and early findings get lost.</p>
+
+    <div class="concept-card warning">
+      <div class="card-label">Symptom — Context Degradation</div>
+      <p>Early in the session, the agent references specific classes it discovered. Later, it starts talking about "typical patterns" instead — generic training knowledge replacing its own findings. The context filled up and the discoveries were pushed out.</p>
+    </div>
+
+    <h3>Technique 1: Scratchpad Files</h3>
+    <p>The agent maintains a file on disk recording key findings as it goes. When it needs to answer a question later, it <strong>reads the scratchpad</strong> first. Findings are on disk — not dependent on surviving in the context window.</p>
+
+    <pre><span class="lang-tag">scratchpad</span><code><span class="cmt">=== SCRATCHPAD: Project Architecture ===</span>
+<span class="fn">Entry point:</span>      <span class="str">src/main/App.java</span>
+<span class="fn">Refund logic:</span>     <span class="str">src/services/RefundCalculator.java</span>
+<span class="fn">Dependencies:</span>     <span class="str">PricingEngine, TaxService, InventoryClient</span>
+<span class="fn">Tests:</span>            <span class="str">tests/services/RefundCalculatorTest.java (47 cases)</span>
+<span class="fn">Config:</span>           <span class="str">refund thresholds in config/policies.yaml</span></code></pre>
+
+    <h3>Technique 2: Subagent Delegation</h3>
+    <p>Instead of the main agent grepping through hundreds of files (filling its own context), it spawns subagents with <strong>isolated context windows</strong>:</p>
+
+    <div class="diagram">Coordinator (clean context — high-level map)
+  ├─→ Subagent A: "Find all test files related to refunds"
+  ├─→ Subagent B: "Trace RefundCalculator dependency chain"
+  └─→ Subagent C: "Identify API endpoints that trigger refunds"
+         │
+         └─→ Each returns concise structured summary
+              (verbose exploration stays contained)</div>
+
+    <h3>Technique 3: Phase-Based Summarization</h3>
+    <p>Summarize findings from Phase 1 <strong>before</strong> spawning subagents for Phase 2. Inject those summaries into the new subagents' initial context. They start with knowledge, not from scratch.</p>
+
+    <h3>Technique 4: Crash Recovery with State Manifests</h3>
+    <p>Each agent periodically exports its state to a known file location. A coordinator-level manifest tracks completion status across all agents. On resume, the coordinator loads the manifest and injects it into the restarted agent's prompt.</p>
+
+    <pre><span class="lang-tag">manifest</span><code><span class="cmt">=== RECOVERY MANIFEST ===</span>
+<span class="fn">Phase:</span>       <span class="str">dependency_mapping</span>
+<span class="fn">Completed:</span>  <span class="str">[architecture_scan, test_discovery]</span>
+<span class="fn">In Progress:</span><span class="str"> refund_flow_trace (agent_3)</span>
+<span class="fn">Pending:</span>    <span class="str">[api_endpoint_mapping, config_analysis]</span>
+<span class="fn">Findings:</span>   <span class="str">/scratchpad/findings.md</span></code></pre>
+
+    <h3>Technique 5: /compact</h3>
+    <p>A practical Claude Code command. When context fills with verbose discovery output, <code class="inline">/compact</code> compresses it — reducing context usage so the session can continue. A pragmatic escape valve, not a replacement for the other techniques.</p>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Throughline</div>
+      <p>Scratchpads, subagent isolation, phase summaries, and manifests are all ways of externalizing knowledge so it doesn't depend on surviving inside the context window.</p>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 6 — Human Review & Confidence      -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk6" style="animation-delay: 0.35s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.5</span>
+      <h2>Human Review & Confidence Calibration</h2>
+    </div>
+
+    <p>At scale, you need to know when to trust the model's output and when to route it to a human reviewer. Aggregate accuracy metrics can mask critical failures.</p>
+
+    <h3>The Aggregate Metric Trap</h3>
+    <div class="concept-card warning">
+      <div class="card-label">Hidden Failure</div>
+      <p><strong>97% overall accuracy</strong> sounds great. But: 99.5% on standard invoices (80% of volume), 82% on handwritten purchase orders, 74% on international documents. Automating based on the aggregate number lets 1 in 4 international documents through with errors.</p>
+    </div>
+    <p><strong>You must validate accuracy by document type and field segment</strong> — not just overall. A single number can't tell you where the system is reliable and where it isn't.</p>
+
+    <h3>Stratified Random Sampling</h3>
+    <p>Pull samples from <strong>each document type and field category</strong>, including high-confidence extractions. This catches calibration drift (model becomes overconfident on new formats) and detects novel error patterns not in the original validation set. This is <strong>ongoing</strong>, not one-time.</p>
+
+    <h3>Field-Level Confidence Scores</h3>
+    <p>Instead of one score per document, the model outputs a score <strong>per field</strong>. A low score on "total amount" routes just that field to human review, even if the rest looks fine.</p>
+
+    <div class="concept-card rule">
+      <div class="card-label">Critical Step — Calibration</div>
+      <p>Confidence thresholds must be calibrated using <strong>labeled validation sets</strong>. You don't pick 0.85 as a cutoff because it "feels right." You measure where the model's scores actually correlate with accuracy and set thresholds from that empirical evidence.</p>
+    </div>
+
+    <h3>Routing Review Attention</h3>
+    <table class="decision-table">
+      <tr>
+        <th>Condition</th>
+        <th>Route</th>
+      </tr>
+      <tr>
+        <td>Low model confidence</td>
+        <td><span class="yes">→ Human review</span></td>
+      </tr>
+      <tr>
+        <td>Ambiguous / contradictory source</td>
+        <td><span class="yes">→ Human review</span></td>
+      </tr>
+      <tr>
+        <td>High confidence, calibrated segment</td>
+        <td>→ Automated + stratified sampling safety net</td>
+      </tr>
+    </table>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Throughline</div>
+      <p>Without calibration, a confidence score is just a number. With calibration, it's a routing decision. Aggregate metrics can lie — stratify by segment to find the truth.</p>
+    </div>
+  </section>
+
+
+  <!-- ════════════════════════════════════════ -->
+  <!-- CHUNK 7 — Information Provenance         -->
+  <!-- ════════════════════════════════════════ -->
+  <section class="chunk" id="chunk7" style="animation-delay: 0.4s">
+    <div class="chunk-header">
+      <span class="chunk-number">5.6</span>
+      <h2>Provenance & Multi-Source Synthesis</h2>
+    </div>
+
+    <p>When multiple subagents gather information from different sources, the synthesis agent must combine it without losing track of where things came from.</p>
+
+    <h3>The Provenance Problem</h3>
+    <p>Subagent A: market size is <strong>$4.2B</strong> (industry report, 2023). Subagent B: market size is <strong>$3.8B</strong> (government dataset, 2021). Synthesis agent writes: <em>"The market size is approximately $4 billion."</em></p>
+    <p>Three failures: <strong>source attribution</strong> gone, <strong>temporal context</strong> gone, <strong>conflict silently resolved</strong> by averaging.</p>
+
+    <h3>Structured Claim-Source Mappings</h3>
+    <p>Each subagent returns findings tied to their source — URL, document name, publication date, methodology. The synthesis agent <strong>must preserve these mappings</strong> through the final output.</p>
+
+    <pre><span class="lang-tag">json</span><code>{
+  <span class="fn">"claim"</span>: <span class="str">"Market size is $4.2B"</span>,
+  <span class="fn">"source"</span>: <span class="str">"Gartner Industry Report 2023"</span>,
+  <span class="fn">"source_url"</span>: <span class="str">"https://..."</span>,
+  <span class="fn">"publication_date"</span>: <span class="str">"2023-06-15"</span>,
+  <span class="fn">"methodology"</span>: <span class="str">"Survey of 500 enterprises"</span>
+}</code></pre>
+
+    <h3>Conflicts: Annotate, Don't Arbitrate</h3>
+    <div class="concept-card rule">
+      <div class="card-label">Hard Rule — Conflict Handling</div>
+      <p>When credible sources disagree, include <strong>both values with explicit annotation</strong>. The subagent does not pick a winner. The coordinator or end user decides how to reconcile. Conflicts are preserved, never hidden.</p>
+    </div>
+
+    <h3>Temporal Context Prevents False Contradictions</h3>
+    <p>The $3.8B (2021) and $4.2B (2023) figures might not conflict at all — they could reflect market growth. Without publication dates in the structured output, the synthesis agent treats them as contradictory claims about the same point in time. <strong>Requiring dates</strong> in subagent outputs prevents this specific class of misinterpretation.</p>
+
+    <h3>Rendering by Content Type</h3>
+    <p>The synthesis output should match the nature of the content: financial data as <strong>tables</strong>, news as <strong>prose</strong>, technical findings as <strong>structured lists</strong>. Don't flatten everything into one uniform format — that loses information and readability.</p>
+
+    <h3>Report Structure</h3>
+    <div class="concept-card pattern">
+      <div class="card-label">Pattern — Well-Established vs. Contested</div>
+      <p>Structure reports with explicit sections distinguishing well-established findings from contested ones. Preserve original source characterizations and methodological context. The reader should always know what's settled and what's debated.</p>
+    </div>
+
+    <div class="takeaway">
+      <div class="takeaway-label">Throughline</div>
+      <p>Provenance is the chain of custody for every fact. If you can't trace a claim back to its source, with its date and methodology, the synthesis is unreliable — no matter how polished the final output looks.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Domain 5 — Context Management & Reliability · Claude Agent SDK Certification
+</footer>
+
+</body>
+</html>

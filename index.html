@@ -6,110 +6,231 @@
     <title> Sahil Bareja </title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
+    <!-- Mobile header (logo + hamburger) -->
+    <header class="mobile-header">
         <div class="logo">
             <a href="#home">Sahil <span>Bareja</span></a>
-            <p class="tagline">Bridging Innovative Technology & Business Reality</p>
+            <p class="tagline">Applied AI Solution Architect | Claude Certified</p>
         </div>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#skills">Skills</a></li>
-                <li><a href="#organizations">Organizations</a></li>
-                <li><a href="#featured-posts">Posts</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
+        <button class="sidenav-toggle" id="sidenavToggle" aria-label="Open navigation">
+            <span></span><span></span><span></span>
+        </button>
     </header>
+
+    <!-- Side nav (desktop always visible, mobile slide-in) -->
+    <nav class="sidenav" id="sidenav">
+        <button class="sidenav-close" id="sidenavClose" aria-label="Close menu">&#10005;</button>
+        <div class="sidenav-logo">
+            <a href="#home">Sahil <span>Bareja</span></a>
+            <p class="sidenav-tagline">Applied AI Solution Architect</p>
+        </div>
+        <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#work">Work</a></li>
+            <li><a href="#skills">Expertise</a></li>
+            <li><a href="#featured-posts">Insights</a></li>
+            <li><a href="#contact">Contact</a></li>
+        </ul>
+    </nav>
+    <div class="sidenav-overlay" id="sidenavOverlay"></div>
+
+    <!-- Fixed cert banner (marketing) -->
+    <a href="https://aimindset-sahilb07.github.io/claude-certified-architect/#d1-chunk1" class="cert-banner" target="_blank" rel="noopener" aria-label="View Claude Certified Architect Study Guide">
+        <img src="images/certificate.png" alt="Claude Certified Architect" class="cert-banner-img" onerror="this.style.display='none'">
+        <span class="cert-banner-content">
+            <span class="cert-banner-title">Claude Certified Architect</span>
+            <span class="cert-banner-tags">
+                <span class="cert-banner-tag">Early Adopter</span>
+                <span class="cert-banner-tag">Foundations</span>
+            </span>
+        </span>
+        <span class="cert-banner-cta">View Study Guide &#8594;</span>
+    </a>
+
     <main>
         <section id="home" class="hero">
             <div class="profile-container">
                 <img src="images/profile.jpeg" alt="Your Profile Picture" class="profile-img">
             </div>
             <div class="hero-content">
-                <h1>Hey, I'm Sahil</h1>
-                <p class="subtitle">I help organizations turn bold technical possibilities into measurable outcomes with flawless execution.</p>
+                <h1>Sahil <span>Bareja</span></h1>
+                <p class="subtitle">Enterprise AI architect. I take organizations from AI pilot to production.</p>
                 <div class="hero-buttons">
                     <a href="https://calendly.com/sahil-n-bareja/30min" class="btn btn-dark" target="_blank" rel="noopener">Book A Call</a>
-                    <a href="#featured-posts" class="btn btn-light">View Posts</a>
+                    <a href="#featured-posts" class="btn btn-light">View Insights</a>
                 </div>
             </div>
         </section>
 
-        <!-- Divider between Hero and About -->
-        <!-- <div class="section-divider"></div> -->
-
-        <section id="about" class="about-sticky">
-          <div class="about-sticky-container">
-            <div class="about-sticky-content">
-              <h2>About Me</h2>
-              <div class="section-content">
-                <p class="about-text">
-                  I’m passionate about translating abstract technology capabilities into concrete business outcomes.<br>
-                  Too many pilots stall in proof‑of‑concept—teams face ballooning budgets and stalled roadmaps.<br>
-                  By designing simple yet effective product strategies and operating models, I deliver measurable ROI that scales.<br>
-                  Outside work, I mentor aspiring PMs, vibe code with GenAI side projects, and train for my next marathon.<br>
-                </p>
-                <div class="about-underline-wrapper">
-                  <div class="about-underline"></div>
-                </div>
-              </div>
+        <!-- Logo strip — social proof immediately after hero -->
+        <div class="logo-strip">
+            <p class="logo-strip-label">Organizations I've worked with</p>
+            <div class="org-logos">
+                <img src="images/org1.png" alt="Organization 1" class="org-logo fade-in-logo">
+                <img src="images/org2.png" alt="Organization 2" class="org-logo fade-in-logo">
+                <img src="images/org3.png" alt="Organization 3" class="org-logo fade-in-logo">
+                <img src="images/org4.png" alt="Organization 4" class="org-logo fade-in-logo">
+                <img src="images/org5.png" alt="Organization 5" class="org-logo fade-in-logo">
+                <img src="images/org6.png" alt="Organization 6" class="org-logo fade-in-logo">
+                <img src="images/org7.svg" alt="Organization 7" class="org-logo fade-in-logo">
             </div>
-          </div>
+        </div>
+
+        <section id="work" class="arch-wins fade-in-section">
+            <h2>Enterprise AI Impact</h2>
+            <div class="section-content">
+                <div class="arch-wins-grid">
+
+                    <div class="case-card">
+                        <div class="case-metric">
+                            <span class="case-metric-number">87%</span>
+                            <span class="case-metric-label">reduction in end-to-end process time</span>
+                        </div>
+                        <div class="case-tag">Commercial Real Estate &middot; Azure</div>
+                        <h3>Enterprise Agentic AI Platform</h3>
+                        <div class="case-row">
+                            <span class="case-label">Challenge</span>
+                            <p>Select between competing AI agent architectures for a live asset management and loan surveillance platform, with full C-suite accountability for the decision.</p>
+                        </div>
+                        <div class="case-row">
+                            <span class="case-label">Solution</span>
+                            <p>Designed an end-to-end LLM evaluation framework measuring accuracy, confidence, and production readiness. Served as primary technical advisor to C-suite and delivery stakeholders across three parallel Azure AI workstreams.</p>
+                        </div>
+                        <div class="case-row">
+                            <span class="case-label">Outcome</span>
+                            <p>Funded PoC approval and full program sign-off. Architected a multi-use-case AI agent program with gated lifecycle checkpoints from pre-production through deployment.</p>
+                        </div>
+                    </div>
+
+                    <div class="case-card">
+                        <div class="case-metric">
+                            <span class="case-metric-number">93%</span>
+                            <span class="case-metric-label">reduction in migration time</span>
+                        </div>
+                        <div class="case-tag">Federal &middot; Legacy Modernization</div>
+                        <h3>AI-Assisted Federal Benefits Migration</h3>
+                        <div class="case-row">
+                            <span class="case-label">Challenge</span>
+                            <p>Modernize a legacy federal benefits platform with 400 APIs and 41 batch jobs at scale — with production-grade accuracy requirements and a tight delivery timeline.</p>
+                        </div>
+                        <div class="case-row">
+                            <span class="case-label">Solution</span>
+                            <p>Scaled an AI-assisted engineering pipeline from PoC to full production, automating API and batch job migration with structured evaluation frameworks and quality gates throughout.</p>
+                        </div>
+                        <div class="case-row">
+                            <span class="case-label">Outcome</span>
+                            <p>95% migration accuracy. Contract extension secured. Converted delivery learnings into a follow-on proposal projecting a 70% reduction in infrastructure setup time.</p>
+                        </div>
+                    </div>
+
+                    <div class="case-card">
+                        <div class="case-metric">
+                            <span class="case-metric-number">75%</span>
+                            <span class="case-metric-label">reduction in time-to-market</span>
+                        </div>
+                        <div class="case-tag">Enterprise Practice &middot; GenAI</div>
+                        <h3>GenAI Center of Excellence</h3>
+                        <div class="case-row">
+                            <span class="case-label">Challenge</span>
+                            <p>Build enterprise-scale AI capability across a global consulting firm — accelerating sales cycles and enabling practitioners to deliver GenAI solutions at speed.</p>
+                        </div>
+                        <div class="case-row">
+                            <span class="case-label">Solution</span>
+                            <p>Co-founded the GenAI CoE and built a Python/Streamlit rapid prototyping framework, enabling enterprise prospects to evaluate working AI solutions before full build commitment.</p>
+                        </div>
+                        <div class="case-row">
+                            <span class="case-label">Outcome</span>
+                            <p>$40M qualified pipeline. 500 global practitioners in 12 months. 25% shorter sales cycles.</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </section>
 
         <section id="skills" class="skills fade-in-section">
-            <h2>Core Competencies</h2>
+            <h2>Technical Expertise</h2>
             <div class="section-content">
-                <div class="skills-grid">
-                    <div class="skill-item">Technical Program Management</div>
-                    <div class="skill-item">Product Roadmap Development</div>
-                    <div class="skill-item">First Principles Thinking</div>
-                    <div class="skill-item">Strategic Planning</div>
-                    <div class="skill-item">Stakeholder Alignment</div>
-                    <div class="skill-item">Risk Management</div>
-                    <div class="skill-item">Digital Transformation</div>
-                    <div class="skill-item">Executive Communication</div>
-                    <div class="skill-item">AI Implementation</div>
-                </div>
-            </div>
-        </section>
 
-        <section id="organizations" class="organizations alt-bg fade-in-section">
-          <h2>Organizations I've Worked With</h2>
-          <div class="section-content">
-            <div class="org-logos">
-              <img src="images/org1.png" alt="Organization 1" class="org-logo fade-in-logo">
-              <img src="images/org2.png" alt="Organization 2" class="org-logo fade-in-logo">
-              <img src="images/org3.png" alt="Organization 3" class="org-logo fade-in-logo">
-              <img src="images/org4.png" alt="Organization 4" class="org-logo fade-in-logo">
-              <img src="images/org5.png" alt="Organization 5" class="org-logo fade-in-logo">
-              <img src="images/org6.png" alt="Organization 6" class="org-logo fade-in-logo">
-              <img src="images/org7.svg" alt="Organization 7" class="org-logo fade-in-logo">
+                <div class="credential-badge anthropic-cred">
+                    <a href="https://verify.skilljar.com/c/tqb4nqcrb8p5" class="anthropic-cert-icon-link" target="_blank" rel="noopener" aria-label="Verify Claude Certified Architect Certificate">
+                        <img src="images/certificate.png" alt="Claude Certified Architect Certificate" class="anthropic-cert-img" onerror="this.style.display='none'">
+                    </a>
+                    <div class="credential-info">
+                        <div class="credential-title">Claude Certified Architect</div>
+                        <div class="credential-tags">
+                            <span class="cred-tag">Early Adopter</span>
+                            <span class="cred-tag">Foundations</span>
+                        </div>
+                        <div class="credential-sub">Anthropic &middot; Issued March 13, 2026</div>
+                    </div>
+                    <div class="credential-actions">
+                        <a href="https://aimindset-sahilb07.github.io/claude-certified-architect/#d1-chunk1" class="credential-link anthropic-study-link" target="_blank" rel="noopener">View Study Guide &rarr;</a>
+                    </div>
+                </div>
+
+                <div class="skill-clusters">
+                    <div class="skill-cluster">
+                        <div class="skill-cluster-title">LLM &amp; AI</div>
+                        <div class="skills-grid">
+                            <div class="skill-item">LLM Evaluation Frameworks</div>
+                            <div class="skill-item">Agentic AI Systems</div>
+                            <div class="skill-item">Multi-Agent Orchestration</div>
+                            <div class="skill-item">Claude Agent SDK</div>
+                            <div class="skill-item">MCP Integration</div>
+                            <div class="skill-item">AI-Assisted Engineering</div>
+                        </div>
+                    </div>
+                    <div class="skill-cluster">
+                        <div class="skill-cluster-title">Cloud &amp; Architecture</div>
+                        <div class="skills-grid">
+                            <div class="skill-item">Azure AI Foundry</div>
+                            <div class="skill-item">AWS Bedrock</div>
+                            <div class="skill-item">Enterprise Solution Architecture</div>
+                            <div class="skill-item">Production Deployment Design</div>
+                        </div>
+                    </div>
+                    <div class="skill-cluster">
+                        <div class="skill-cluster-title">Customer Advisory</div>
+                        <div class="skills-grid">
+                            <div class="skill-item">Technical Discovery</div>
+                            <div class="skill-item">Executive Briefings</div>
+                            <div class="skill-item">PoC Design &amp; Evaluation</div>
+                            <div class="skill-item">Stakeholder Alignment</div>
+                            <div class="skill-item">GTM Collaboration</div>
+                            <div class="skill-item">Risk Management</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
-          </div>
         </section>
 
         <section id="featured-posts" class="featured-posts">
-            <h2>Featured Posts</h2>
+            <h2>AI Thought Leadership</h2>
             <div class="section-content">
-                <div class="carousel-container">
-                    <div class="carousel-track">
-                        <!-- LinkedIn Post 1 -->
-                        <div class="carousel-slide">
-                            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7307815127834058752?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 1"></iframe>
-                        </div>
-                        <!-- LinkedIn Post 2 -->
-                        <div class="carousel-slide">
-                            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7315206988731154432?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 2"></iframe>
-                        </div>
-                        <!-- LinkedIn Post 3 -->
-                        <div class="carousel-slide">
-                            <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7261952879635107840?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 3"></iframe>
+                <div class="carousel-wrapper">
+                    <div class="carousel-container">
+                        <div class="carousel-track">
+                            <!-- LinkedIn Post 1 -->
+                            <div class="carousel-slide">
+                                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7307815127834058752?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 1"></iframe>
+                            </div>
+                            <!-- LinkedIn Post 2 -->
+                            <div class="carousel-slide">
+                                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7315206988731154432?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 2"></iframe>
+                            </div>
+                            <!-- LinkedIn Post 3 -->
+                            <div class="carousel-slide">
+                                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7261952879635107840?collapsed=1" height="399" width="504" frameborder="0" allowfullscreen="" title="Embedded post 3"></iframe>
+                            </div>
+                            <!-- LinkedIn Post 4 -->
+                            <div class="carousel-slide">
+                                <iframe src="https://www.linkedin.com/embed/feed/update/urn:li:ugcPost:7406719372976816128?collapsed=1" height="610" width="504" frameborder="0" allowfullscreen="" title="Embedded post 4"></iframe>
+                            </div>
                         </div>
                     </div>
                     <button class="carousel-btn prev" aria-label="Previous Post">&#10094;</button>
@@ -176,23 +297,26 @@
       revealSectionContent();
     });
 
-    // Simple scroll fade-in animation for sections and org logos
+    // Simple scroll fade-in animation for sections
     function revealSections() {
       const sections = document.querySelectorAll('section');
       const trigger = window.innerHeight * 0.85;
       sections.forEach(section => {
         const top = section.getBoundingClientRect().top;
-        if (top < trigger) {
-          section.classList.add('visible');
-          // If this is the organizations section, fade in logos staggered
-          if (section.classList.contains('organizations')) {
-            const logos = section.querySelectorAll('.org-logo');
-            logos.forEach((logo, idx) => {
-              setTimeout(() => logo.classList.add('visible'), 150 * idx);
-            });
-          }
-        }
+        if (top < trigger) section.classList.add('visible');
       });
+
+      // Logo strip fade-in (not a section, so handled separately)
+      const logoStrip = document.querySelector('.logo-strip');
+      if (logoStrip) {
+        const top = logoStrip.getBoundingClientRect().top;
+        if (top < trigger) {
+          const logos = logoStrip.querySelectorAll('.org-logo');
+          logos.forEach((logo, idx) => {
+            setTimeout(() => logo.classList.add('visible'), 100 * idx);
+          });
+        }
+      }
     }
     window.addEventListener('scroll', revealSections);
     window.addEventListener('load', revealSections);
@@ -218,7 +342,7 @@
 
     // Modern scrollspy for nav highlight
     document.addEventListener('DOMContentLoaded', function() {
-      const navLinks = document.querySelectorAll('nav ul li a[href^="#"]');
+      const navLinks = document.querySelectorAll('.sidenav ul li a[href^="#"]');
       const sections = Array.from(document.querySelectorAll('section'));
       function onScrollSpy() {
         let scrollPos = window.scrollY + 110; // offset for fixed header
@@ -288,9 +412,37 @@
     window.addEventListener('load', function() {
       animateAboutUnderline();
     });
+
+    // Side nav toggle
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggle = document.getElementById('sidenavToggle');
+      const closeBtn = document.getElementById('sidenavClose');
+      const sidenav = document.getElementById('sidenav');
+      const overlay = document.getElementById('sidenavOverlay');
+
+      function openNav() {
+        sidenav.classList.add('open');
+        overlay.classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeNav() {
+        sidenav.classList.remove('open');
+        overlay.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+
+      if (toggle) toggle.addEventListener('click', openNav);
+      if (closeBtn) closeBtn.addEventListener('click', closeNav);
+      if (overlay) overlay.addEventListener('click', closeNav);
+
+      // Close on nav link click (mobile)
+      sidenav.querySelectorAll('a[href^="#"]').forEach(link => {
+        link.addEventListener('click', closeNav);
+      });
+    });
     </script>
     <footer>
-        <p>&copy; 2025 Sahil Bareja. All rights reserved.</p>
+        <p>&copy; 2026 Sahil Bareja. All rights reserved.</p>
     </footer>
 </body>
 </html>
